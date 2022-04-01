@@ -1,6 +1,18 @@
 version: '3.8'
 
 services:
+  db:
+    image: mysql
+    command: ["--default-authentication-plugin=mysql_native_password"]
+    ports:
+      - "127.0.0.1:3306:3306"
+    env_file:
+      - ./.env_dev
+    volumes:
+      - mysql_data:/var/lib/mysql
+    cap_add:
+      - SYS_NICE
+
   flask_app:
     build: ./flask_app
     ports: 
@@ -9,3 +21,6 @@ services:
       - ./.env_dev
     volumes:
       - ./flask_app:/flask_app
+        
+volumes:
+  mysql_data:
