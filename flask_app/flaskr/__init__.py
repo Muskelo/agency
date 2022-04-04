@@ -15,7 +15,7 @@ def init_db(app):
 def init_api(app):
     api = Api(app)
 
-    api.add_resource(UserResource, '/users')
+    api.add_resource(UserResource, '/users/', '/users/<user_id>')
 
 def create_app():
     app = Flask(__name__)

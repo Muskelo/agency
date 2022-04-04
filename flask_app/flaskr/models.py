@@ -1,7 +1,7 @@
 from flaskr.db import db
-from flaskr.mixins import BaseMixin
+from flaskr.mixins import UserMixin
 
-class UserModel(db.Model, BaseMixin):
+class UserModel(db.Model, UserMixin):
     __tablename__ = 'user'
 
     id = db.Column(db.Integer,  primary_key=True)

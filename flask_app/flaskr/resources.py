@@ -1,32 +1,27 @@
-from typing import List
-from pydantic import BaseModel
-from flask import current_app
+from flask import g
 from flask_restful import Resource
 
 from flaskr.models import UserModel
-
-
-class User(BaseModel):
-    id: int
-    login: str
-    email: str
-    password_hash: str
-
-    class Config:
-        orm_mode = True
-
-
-class Users(BaseModel):
-    users: List[User]
+from flaskr.data_models import DumpUser, DumpUsers, LoadUser
+from flaskr.utils import with_data
 
 
 class UserResource(Resource):
-    def get(self):
-        # users = UserModel.get_all_()
-        # # current_app.logger.info(users)
+    def get(self, user_id=None):
+        if user_id:
+            user = UserModel.get_(True, id=user_id)
+            response_data = DumpUser(user=user).dict()
 
-        # return {'users' : [User.from_orm(user).dict() for user in users]}
-        users = Users(users=UserModel.get_all_())
-        # current_app.logger.info(users)
+        else:
+            users = UserModel.get_all_()
+            response_data = DumpUsers(users=users).dict()
 
-        return {'users': users.dict()}
+        return response_data
+
+    @with_data(LoadUser)
+    def post(self):
+        user = UserModel.create_(**g.request_data['user'])
+        response_data = DumpUser(user=user)
+        
+        return response_data
+        
