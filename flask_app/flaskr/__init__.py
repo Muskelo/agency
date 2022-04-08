@@ -14,7 +14,7 @@ def init_db(app):
     Migrate(app, db)
 
 def init_api(app):
-    api = Api(app)
+    api = Api(app, prefix="/api")
 
     api.add_resource(UserResource, '/users/', '/users/<id>')
     api.add_resource(RoleResource, '/roles/', '/roles/<id>')

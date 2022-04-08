@@ -21,6 +21,15 @@ services:
       - ./.env_dev
     volumes:
       - ./flask_app:/flask_app
-        
+
+  nginx:
+    image: nginx
+    ports: 
+      - '127.0.0.1:8080:80'
+    env_file:
+      - ./.env_dev
+    volumes:
+      - ./nginx:/etc/nginx
+ 
 volumes:
   mysql_data:

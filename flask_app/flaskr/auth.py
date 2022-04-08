@@ -6,7 +6,6 @@ from passlib.hash import pbkdf2_sha256
 from flaskr.models import UserModel
 
 class MyHTTPBasicAuth(HTTPBasicAuth):
-
     def login_required(self, f=None, role=None, optional=None, get_item_f=None, get_item_view_arg="id"):
         if f is not None and \
                 (role is not None or optional is not None):  # pragma: no cover
@@ -54,7 +53,6 @@ class MyHTTPBasicAuth(HTTPBasicAuth):
         if f:
             return login_required_internal(f)
         return login_required_internal
-
 
 
 auth = MyHTTPBasicAuth()
