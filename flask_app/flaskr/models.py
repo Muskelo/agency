@@ -1,5 +1,6 @@
 from flaskr.db import db
-from flaskr.mixins import BaseMixin, UserMixin, generate_symlink_on_id
+from flaskr.mixins import BaseMixin, UserMixin
+from flaskr.utils import generate_symlink_on_id
 
 user_role = db.Table('user_role',
                      db.Column('user_id', db.Integer, db.ForeignKey(

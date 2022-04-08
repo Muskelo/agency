@@ -46,3 +46,29 @@ def with_data(LoadClass=None):
         return wrapped
     return decorator
 
+def generate_symlink_on_id(items_name, ItemModel):
+    def get_items_id(self):
+        return [item.id for item in getattr(self, items_name)]
+
+    def set_items_id(self, new_value):
+        new_value = set(new_value)
+        items_id = set(get_items_id(self))
+        items = getattr(self, items_name)
+
+        append_items_id = new_value.difference(items_id)
+
+        if append_items_id:
+            for item_id in append_items_id:
+                item = ItemModel.get_(id=item_id)
+                items.append(item)
+
+        pop_items_id = items_id.difference(new_value)
+
+        if pop_items_id:
+            for item_id in pop_items_id:
+                item = ItemModel.get_(id=item_id)
+                items.remove(item)
+
+        setattr(self, items_name, items)
+
+    return property(fget=get_items_id, fset=set_items_id)
