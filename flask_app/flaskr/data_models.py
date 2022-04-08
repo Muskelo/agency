@@ -19,6 +19,7 @@ class DumpUser(BaseModel):
 class DumpUsers(BaseModel):
     users: List[BaseDumpUser]
 
+
 class BaseLoadUser(BaseModel):
     login: str
     email: str
@@ -26,6 +27,7 @@ class BaseLoadUser(BaseModel):
 
 class LoadUser(BaseModel):
     user: BaseLoadUser
+
 
 class BaseLoadOptionalUser(BaseModel):
     login: Optional[str]
@@ -49,4 +51,11 @@ class DumpRole(BaseModel):
 
 class DumpRoles(BaseModel):
     roles: List[BaseDumpRole]
+
+
+class BaseLoadOptionalRole(BaseModel):
+    users_id: Optional[List[int]]
+
+class LoadOptionalRole(BaseModel):
+    role: BaseLoadOptionalRole
 

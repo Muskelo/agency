@@ -2,13 +2,12 @@ from flask import g, request
 from flask_restful import Resource, abort
 
 from flaskr.models import RoleModel, UserModel
-from flaskr.data_models import DumpRole, DumpRoles, DumpUser, DumpUsers, LoadOptionalUser, LoadUser
+from flaskr.data_models import *
 from flaskr.utils import with_data
 from flaskr.auth import auth
 
 
 class UserResource(Resource):
-
     def get(self, id=None):
         if id:
             user = UserModel.get_(id=id)
@@ -28,8 +27,8 @@ class UserResource(Resource):
 
         
     @auth.login_required(role=['admin'], get_item_f=UserModel.get_)
-    def delete(self, user_id):
-        user = UserModel.delete_(user_id)
+    def delete(self, id):
+        user = UserModel.delete_(id)
 
         return DumpUser(user=user).dict()
 
@@ -40,8 +39,8 @@ class UserResource(Resource):
 
         return DumpUser(user=user).dict()
 
-class RoleResource(Resource):
 
+class RoleResource(Resource):
     @auth.login_required(role=['admin'])
     def get(self, id=None):
         if id:
@@ -55,10 +54,9 @@ class RoleResource(Resource):
         return response_data
 
     @auth.login_required(role=['admin'])
-    @with_data(LoadOptionalUser)
+    @with_data(LoadOptionalRole)
     def patch(self, id):
         role = RoleModel.update_(id, **g.request_data['role'])
 
         return DumpRole(role=role).dict()
-
 

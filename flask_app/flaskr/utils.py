@@ -45,3 +45,4 @@ def with_data(LoadClass=None):
             return result
         return wrapped
     return decorator
+
