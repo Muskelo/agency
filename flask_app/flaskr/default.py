@@ -18,9 +18,9 @@ def init_default_data():
 
     # set roles for admin user
     if not admin_user in admin_role.users:
-        admin_role.users.append(admin_user)
+        RoleModel.update_(admin_role.id, users_id=[*admin_role.users_id, admin_user.id])
     if not admin_user in moder_role.users:
-        moder_role.users.append(admin_user)
+        RoleModel.update_(moder_role.id, users_id=[*moder_role.users_id, admin_user.id])
 
 
 

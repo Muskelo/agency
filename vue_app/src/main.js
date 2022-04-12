@@ -1,4 +1,12 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 
-createApp(App).mount('#app')
+import "bootstrap"
+
+import fetchApi from "./_methods/fetch.js"
+
+const app = createApp(App);
+
+app.config.globalProperties.fetchApi = fetchApi;
+
+app.mount('#app');

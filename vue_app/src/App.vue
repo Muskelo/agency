@@ -1,21 +1,46 @@
-<script setup>
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
-import HelloWorld from './components/HelloWorld.vue'
+<script>
+import Header from "./components/Header.vue";
+
+export default {
+  data() {
+    return {
+      message: "Hello World!",
+      roles: "",
+      login: "",
+      password: "",
+    };
+  },
+  methods: {
+    getRoles() {
+      this.fetchApi("/api/roles/", { roles: "roles" });
+    },
+    logout() {
+      this.fetchApi("/api/roles/", { roles: "roles" }, true);
+    },
+  },
+  mounted() {},
+  components: {
+    Header,
+  },
+};
 </script>
 
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello World" />
+  <Header />
+  <p>{{ roles }}</p>
+  <button @click="getRoles">Обновить роли</button>
+  <button @click="logout">выйти роли</button>
+
+  <label for="login">Логин</label>
+  <input v-model="login" name="login" />
+
+  <label for="password">Пароль</label>
+  <input v-model="password" type="password" name="password" />
+
 </template>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+@import "../node_modules/bootstrap/dist/css/bootstrap.css";
 </style>
+
+
