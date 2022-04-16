@@ -1,6 +1,7 @@
 from flask import request, g
 from flask_httpauth import HTTPBasicAuth
 from functools import wraps
+from flask_restful import abort
 from passlib.hash import pbkdf2_sha256
 
 from flaskr.models import UserModel
@@ -67,3 +68,7 @@ def verify_password(username, password):
 
     if user and pbkdf2_sha256.verify(password, user.password_hash):
         return user
+
+@auth.error_handler
+def auth_error(status):
+    return abort(status)

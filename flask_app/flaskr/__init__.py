@@ -6,6 +6,7 @@ from flaskr.db import db
 from flaskr.config import Configuration
 from flaskr.resources import RoleResource, UserResource
 from flaskr.default import init_default_data
+from flaskr.errors import init_error_handler
 
 def init_db(app):
     """ Init db and migrations. """
@@ -28,6 +29,7 @@ def create_app():
 
     init_db(app)
     init_api(app)
+    init_error_handler(app)
 
 
     
