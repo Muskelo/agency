@@ -8,9 +8,20 @@ from flaskr.auth import auth
 
 
 class UserResource(Resource):
+
+    @auth.login_required()
+    def get_me(self):
+        return auth.current_user()
+        
     def get(self, id=None):
         if id:
-            user = UserModel.get_(id=id)
+            if int(id) != -1:
+                user = UserModel.get_(id=id)
+
+            # get current_user
+            else:
+                user = self.get_me()
+
             response_data = DumpUser(user=user).dict()
 
         else:
@@ -19,13 +30,13 @@ class UserResource(Resource):
 
         return response_data
 
+
     @with_data(LoadUser)
     def post(self):
         user = UserModel.create_(**g.request_data['user'])
 
         return DumpUser(user=user).dict()
 
-        
     @auth.login_required(role=['admin'], get_item_f=UserModel.get_)
     def delete(self, id):
         user = UserModel.delete_(id)
@@ -59,4 +70,3 @@ class RoleResource(Resource):
         role = RoleModel.update_(id, **g.request_data['role'])
 
         return DumpRole(role=role).dict()
-
