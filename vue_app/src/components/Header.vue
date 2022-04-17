@@ -1,7 +1,12 @@
 <script>
+import { useCurrentUser } from "../stores/currentUser";
+
 export default {
   data() {
+    const currentUser = useCurrentUser();
+
     return {
+      currentUser,
     };
   },
 };
@@ -23,18 +28,18 @@ export default {
             <a class="nav-link active" aria-current="page" href="#">Home</a>
           </li>
 
-          <li class="nav-item">
-            <button type="button" v-if="!this.current_user.data.id" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalLogin">
+          <li class="nav-item" v-if="!currentUser.id">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalLogin">
               Вход
             </button>
           </li>
-          <li class="nav-item">
-            <button type="button" v-if="!this.current_user.data['id']" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalRegister">
+          <li class="nav-item" v-if="!currentUser.id">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalRegister">
               Регистрация
             </button>
           </li>
-          <li class="nav-item">
-            <button type="button" @click="current_user.logout" v-if="current_user.data['id']" class="btn btn-primary">
+          <li class="nav-item" v-if="currentUser.id">
+            <button @click="currentUser.logout" type="button" class="btn btn-primary">
               Выход
             </button>
           </li>

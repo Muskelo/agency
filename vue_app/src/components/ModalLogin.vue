@@ -32,16 +32,21 @@
 </template>
 
 <script>
+import {useCurrentUser} from "../stores/currentUser";
+
 export default {
   data() {
+    const currentUser = useCurrentUser();
+
     return {
       login: "",
       password: "",
+      currentUser
     };
   },
   methods: {
     login_f() {
-      this.current_user.login_f(this.login, this.password);
+      this.currentUser.login_f(this.login, this.password);
     },
   },
 };

@@ -380,6 +380,11 @@ magic-string@^0.25.7:
   dependencies:
     sourcemap-codec "^1.4.8"
 
+mande@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/mande/-/mande-2.0.1.tgz#9fa1f2cea5e2f5add84a1fc5fe79c448c13278fa"
+  integrity sha512-IkId2U/+SEDJcsdGDvE94WZXGkCT7YTQ/DMmqkF4q3lA7Od+wWbPrMRQG04ytGVOuY3AshBH3dMHRlktUXgHTg==
+
 nanoid@^3.3.1:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.2.tgz#c89622fafb4381cd221421c69ec58547a1eec557"

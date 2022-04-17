@@ -1,4 +1,6 @@
 <script>
+import { usersApi } from "../api";
+
 export default {
   data() {
     return {
@@ -16,9 +18,8 @@ export default {
           email: this.email,
         },
       };
-      this.fetchApi("/api/users/", {
-        data: data,
-        method: "POST",
+      usersApi.post(data).catch(() => {
+        alert("Данный логин уже занят");
       });
     },
   },
