@@ -1,42 +1,48 @@
 <script>
 import Header from "./components/Header.vue";
+import ModalLogin from "./components/ModalLogin.vue";
+import ModalRegister from "./components/ModalRegister.vue";
+import { useCurrentUser } from "./stores/currentUser";
 
 export default {
   data() {
+    const currentUser = useCurrentUser();
     return {
+      current_user_id: this.current_user.id,
       message: "Hello World!",
       roles: "",
-      login: "",
       password: "",
+      currentUser
     };
   },
   methods: {
     getRoles() {
-      this.fetchApi("/api/roles/", { roles: "roles" });
+      this.fetchApi("/api/roles/", {
+        attributes: { roles: "roles" },
+      });
     },
-    logout() {
-      this.fetchApi("/api/roles/", { roles: "roles" }, true);
+    login_() {
+      this.current_user.setAuthorizationHeader(this.login, this.password);
     },
   },
   mounted() {},
   components: {
     Header,
+    ModalLogin,
+    ModalRegister,
   },
 };
 </script>
 
 <template>
   <Header />
-  <p>{{ roles }}</p>
+  <p>{{ currentUser.login }}</p>
   <button @click="getRoles">Обновить роли</button>
-  <button @click="logout">выйти роли</button>
 
-  <label for="login">Логин</label>
-  <input v-model="login" name="login" />
+  <p>{{ login }}</p>
 
-  <label for="password">Пароль</label>
-  <input v-model="password" type="password" name="password" />
-
+  <ModalLogin />
+  <ModalRegister />
 </template>
 
 <style>
