@@ -59,3 +59,16 @@ class BaseLoadOptionalRole(BaseModel):
 class LoadOptionalRole(BaseModel):
     role: BaseLoadOptionalRole
 
+
+class BaseDumpImage(BaseModel):
+    id: int
+    filename: str
+    user_id: int
+    housing_id = int
+
+    class Config:
+        orm_mode = True
+
+class DumpImage(BaseModel):
+    image: BaseDumpImage
+

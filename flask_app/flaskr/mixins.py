@@ -1,5 +1,9 @@
+import os
+
+from flask import current_app
 from flask_restful import abort
 from passlib.hash import pbkdf2_sha256
+from werkzeug.utils import secure_filename
 
 from flaskr.utils import save_in_db
 
@@ -53,8 +57,6 @@ class BaseMixin():
         return item
 
 
-     
-
 class UserMixin(BaseMixin):
     """ User Mixin """
 
@@ -69,11 +71,36 @@ class UserMixin(BaseMixin):
 
     @classmethod
     def update_(cls, id, **kwargs):
-       if kwargs["password"]:
+        if kwargs["password"]:
             kwargs["password_hash"] = pbkdf2_sha256.hash(kwargs['password'])
             kwargs.pop("password")
 
-       user = super().update_(id, **kwargs)
+        user = super().update_(id, **kwargs)
 
-       return user
+        return user
 
+
+class ImageMixin(BaseMixin):
+    @classmethod
+    def create_(cls, **kwargs):
+
+        # get image info
+        image_file = kwargs.pop("image_file")
+        image_filename = secure_filename(image_file.filename)
+
+        # create image object in DB
+        image = super().create_(**kwargs)
+
+        # try save image file
+        filename = os.path.join(
+            current_app.config['UPLOAD_FOLDER'], f"{image.id}__{image_filename}")
+        try:
+            image_file.save(filename)
+        except:
+            super().delete_(image.id)
+            abort(500)
+
+        # update filename if file saved
+        image = super().update_(image.id, filename=filename)
+
+        return image

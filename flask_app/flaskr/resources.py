@@ -1,18 +1,17 @@
 from flask import g, request
 from flask_restful import Resource, abort
 
-from flaskr.models import RoleModel, UserModel
+from flaskr.models import RoleModel, UserModel, ImageModel
 from flaskr.data_models import *
 from flaskr.utils import with_data
 from flaskr.auth import auth
 
 
 class UserResource(Resource):
-
     @auth.login_required()
     def get_me(self):
         return auth.current_user()
-        
+
     def get(self, id=None):
         if id:
             if int(id) != -1:
@@ -29,7 +28,6 @@ class UserResource(Resource):
             response_data = DumpUsers(users=users).dict()
 
         return response_data
-
 
     @with_data(LoadUser)
     def post(self):
@@ -70,3 +68,19 @@ class RoleResource(Resource):
         role = RoleModel.update_(id, **g.request_data['role'])
 
         return DumpRole(role=role).dict()
+
+
+class ImageResource(Resource):
+
+    @auth.login_required
+    def post(self):
+        image_file = request.files['image']
+
+        image = ImageModel.create_(image_file=image_file, user_id=auth.current_user().id)
+
+        return DumpImage(image=image).dict()
+
+    def delete(self, id):
+        image = ImageModel.delete_(id)
+
+        return {"name": image["filename"]}

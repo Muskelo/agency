@@ -4,7 +4,7 @@ from flask_restful import Api
 
 from flaskr.db import db 
 from flaskr.config import Configuration
-from flaskr.resources import RoleResource, UserResource
+from flaskr.resources import ImageResource, RoleResource, UserResource
 from flaskr.default import init_default_data
 from flaskr.errors import init_error_handler
 
@@ -19,6 +19,7 @@ def init_api(app):
 
     api.add_resource(UserResource, '/users/', '/users/<id>')
     api.add_resource(RoleResource, '/roles/', '/roles/<id>')
+    api.add_resource(ImageResource, '/images/', '/roles/<id>')
 
 
 def create_app():

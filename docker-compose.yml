@@ -21,6 +21,7 @@ services:
       - ./.env_dev
     volumes:
       - ./flask_app:/flask_app
+      - uploads:/uploads
 
   vue_app:
     build: ./vue_app
@@ -39,7 +40,9 @@ services:
       - ./.env_dev
     volumes:
       - ./nginx:/etc/nginx
+      - uploads:/www/data/uploads
  
 volumes:
   mysql_data:
-  node_modules:
+  uploads:
+
