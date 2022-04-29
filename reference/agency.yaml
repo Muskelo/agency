@@ -1,0 +1,293 @@
+openapi: 3.1.0
+info:
+  title: agency
+  version: '1.0'
+  description: ''
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  '/api/users/{userId}':
+    parameters:
+      - schema:
+          type: integer
+        name: userId
+        in: path
+        required: true
+        description: Id of an existing user.
+    get:
+      summary: Get User Info by User ID
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+        '404':
+          $ref: '#/components/responses/Error'
+      operationId: get-users-userId
+      description: Retrieve the information of the user with the matching user ID.
+    patch:
+      summary: Update User Information
+      operationId: patch-users-userId
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+      description: Update the information of an existing user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    login:
+                      type: string
+                    password:
+                      type: string
+                    number:
+                      type: string
+              required:
+                - data
+            examples:
+              Update user:
+                value:
+                  data:
+                    login: string
+                    password: string
+                    number: '9999999999'
+        description: Patch user properties to update.
+    delete:
+      summary: ''
+      operationId: delete-users-userId
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+      description: Delete user
+  /api/users:
+    post:
+      summary: Create New User
+      operationId: post-user
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  required:
+                    - login
+                    - password
+                    - number
+                  properties:
+                    login:
+                      type: string
+                    password:
+                      type: string
+                    number:
+                      type: string
+              required:
+                - data
+            examples: {}
+        description: Post the necessary fields for the API to create a new user.
+      description: Create a new user.
+      security:
+        - HTTPAuth: []
+    get:
+      summary: Get Users
+      operationId: get-user
+      responses:
+        '200':
+          $ref: '#/components/responses/UsersList'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      description: Return users list
+    parameters: []
+  /api/items:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses: {}
+      operationId: get-api-items
+      description: Return items list
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: offset
+        - schema:
+            type: string
+          in: query
+          name: limit
+        - schema:
+            type: string
+          in: query
+          name: search
+    parameters: []
+components:
+  schemas:
+    User:
+      title: User
+      type: object
+      description: ''
+      examples:
+        - id: 0
+          login: string
+          number: string
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the given user.
+        login:
+          type: string
+        number:
+          type: string
+          description: 'owner, moder or admin role required'
+        role:
+          type: string
+      required:
+        - id
+        - login
+    Item:
+      title: Item
+      type: object
+      examples:
+        - id: 0
+          size: 0
+          price: 0
+          rooms: 0
+          floor: 0
+          total_floor: 0
+          type: string
+          city: string
+          address: string
+          description: string
+      properties:
+        id:
+          type: integer
+        size:
+          type: integer
+        price:
+          type: integer
+        rooms:
+          type: integer
+        floor:
+          type: integer
+        total_floor:
+          type: integer
+        type:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        description:
+          type: string
+  securitySchemes:
+    HTTPAuth:
+      type: http
+      scheme: basic
+      description: ''
+  responses:
+    Error:
+      description: Base error response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+          examples:
+            Error:
+              value:
+                message: string
+    User:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/User'
+          examples:
+            Get User:
+              value:
+                data:
+                  id: 0
+                  login: string
+                  number: string
+    UsersList:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+          examples:
+            Get users list:
+              value:
+                data:
+                  - id: 0
+                    login: string
+                    number: '89999999998'
+                  - id: 1
+                    login: string1
+                    number: '89999999999'
+    ValidationError:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    loc:
+                      type: string
+                    message:
+                      type: string
+          examples:
+            ValidationError:
+              value:
+                message: string
+                errors:
+                  - loc: string
+                    message: string
+  parameters: {}
+security:
+  - HTTPAuth: []
