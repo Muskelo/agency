@@ -4,9 +4,9 @@ info:
   version: '1.0'
   description: ''
 servers:
-  - url: 'http://localhost:3000'
+  - url: 'http://localhost:3000/api'
 paths:
-  '/api/users/{userId}':
+  '/users/{userId}':
     parameters:
       - schema:
           type: integer
@@ -15,16 +15,16 @@ paths:
         required: true
         description: Id of an existing user.
     get:
-      summary: Get User Info by User ID
+      summary: Get User
       responses:
         '200':
           $ref: '#/components/responses/User'
         '404':
           $ref: '#/components/responses/Error'
       operationId: get-users-userId
-      description: Retrieve the information of the user with the matching user ID.
+      description: 'Return user by id, return current if userId=-1'
     patch:
-      summary: Update User Information
+      summary: Update User
       operationId: patch-users-userId
       responses:
         '200':
@@ -39,7 +39,7 @@ paths:
           $ref: '#/components/responses/Error'
         '409':
           $ref: '#/components/responses/Error'
-      description: Update the information of an existing user.
+      description: ''
       requestBody:
         content:
           application/json:
@@ -66,7 +66,7 @@ paths:
                     number: '9999999999'
         description: Patch user properties to update.
     delete:
-      summary: ''
+      summary: Delete User
       operationId: delete-users-userId
       responses:
         '200':
@@ -77,8 +77,8 @@ paths:
           $ref: '#/components/responses/Error'
         '404':
           $ref: '#/components/responses/Error'
-      description: Delete user
-  /api/users:
+      description: ''
+  /users:
     post:
       summary: Create New User
       operationId: post-user
@@ -115,24 +115,108 @@ paths:
       description: Create a new user.
       security:
         - HTTPAuth: []
+    parameters: []
+  '/items/{itemId}':
+    parameters:
+      - schema:
+          type: string
+        name: itemId
+        in: path
+        required: true
     get:
-      summary: Get Users
-      operationId: get-user
+      summary: Get Item
+      tags: []
       responses:
         '200':
-          $ref: '#/components/responses/UsersList'
+          $ref: '#/components/responses/Item'
+        '404':
+          $ref: '#/components/responses/Error'
+      operationId: get-items-itemId
+      description: ''
+    patch:
+      summary: Update Item
+      operationId: patch-items-itemId
+      responses:
+        '200':
+          $ref: '#/components/responses/Item'
+        '400':
+          $ref: '#/components/responses/ValidationError'
         '401':
           $ref: '#/components/responses/Error'
         '403':
           $ref: '#/components/responses/Error'
-      description: Return users list
-    parameters: []
-  /api/items:
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              x-examples:
+                example-1:
+                  data:
+                    size: 0
+                    price: 0
+                    rooms: 0
+                    floor: 0
+                    total_floor: 0
+                    type: string
+                    city: string
+                    address: string
+                    description: string
+                    images_id:
+                      - 0
+              properties:
+                data:
+                  type: object
+                  properties:
+                    size:
+                      type: number
+                    price:
+                      type: number
+                    rooms:
+                      type: number
+                    floor:
+                      type: number
+                    total_floor:
+                      type: number
+                    type:
+                      type: string
+                    city:
+                      type: string
+                    address:
+                      type: string
+                    description:
+                      type: string
+                    images_id:
+                      type: array
+                      items:
+                        type: integer
+              required:
+                - data
+    delete:
+      summary: Delete Item
+      operationId: delete-items-itemId
+      responses:
+        '200':
+          $ref: '#/components/responses/Item'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /items:
     get:
-      summary: Your GET endpoint
+      summary: Get list of Items
       tags: []
-      responses: {}
-      operationId: get-api-items
+      responses:
+        '200':
+          $ref: '#/components/responses/ItemsList'
+      operationId: get-items
       description: Return items list
       parameters:
         - schema:
@@ -147,7 +231,144 @@ paths:
             type: string
           in: query
           name: search
+          description: Search by address or sity
     parameters: []
+    post:
+      summary: Create new Item
+      operationId: post-items
+      responses:
+        '200':
+          $ref: '#/components/responses/Item'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: ''
+              type: object
+              x-examples:
+                example-1:
+                  data:
+                    id: 0
+                    size: 0
+                    price: 0
+                    rooms: 0
+                    floor: 0
+                    total_floor: 0
+                    type: string
+                    city: string
+                    address: string
+                    description: string
+                    images_id:
+                      - 0
+              properties:
+                data:
+                  type: object
+                  required:
+                    - size
+                    - price
+                    - rooms
+                    - floor
+                    - total_floor
+                    - type
+                    - city
+                    - address
+                    - description
+                    - images_id
+                  properties:
+                    size:
+                      type: number
+                    price:
+                      type: number
+                    rooms:
+                      type: number
+                    floor:
+                      type: number
+                    total_floor:
+                      type: number
+                    type:
+                      type: string
+                    city:
+                      type: string
+                    address:
+                      type: string
+                    description:
+                      type: string
+                    images_id:
+                      type: array
+                      items:
+                        type: integer
+              required:
+                - data
+            examples: {}
+      description: ''
+  /images:
+    post:
+      summary: Upload Image
+      operationId: post-images
+      responses:
+        '200':
+          $ref: '#/components/responses/Image'
+        '400':
+          $ref: '#/components/responses/OrdersList'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties: {}
+        description: Request must include image
+      parameters: []
+      description: 'Upload image, and return image info'
+    get:
+      summary: Get list of Images
+      operationId: get-images
+      responses:
+        '200':
+          $ref: '#/components/responses/ImagesList'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+      parameters:
+        - schema:
+            type: string
+            default: current_user.id
+          in: query
+          name: user_id
+      description: 'Default return images that belongs current user, but without item_id '
+  /orders:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          $ref: '#/components/responses/OrdersList'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+      operationId: get-orders
+      parameters:
+        - schema:
+            type: string
+          in: query
+          required: true
+          name: item_id
+      description: ''
 components:
   schemas:
     User:
@@ -155,9 +376,9 @@ components:
       type: object
       description: ''
       examples:
-        - id: 0
-          login: string
-          number: string
+        - id: 1
+          login: muskelo
+          number: admin
       properties:
         id:
           type: integer
@@ -186,6 +407,13 @@ components:
           city: string
           address: string
           description: string
+          images_id:
+            - 0
+          images:
+            - id: 0
+              url: string
+              user_id: 0
+              item_id: 0
       properties:
         id:
           type: integer
@@ -207,6 +435,68 @@ components:
           type: string
         description:
           type: string
+        images_id:
+          type: array
+          items:
+            type: integer
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/Image'
+      required:
+        - id
+        - size
+        - price
+        - rooms
+        - floor
+        - total_floor
+        - type
+        - city
+        - address
+        - description
+        - images_id
+        - images
+    Image:
+      title: Image
+      type: object
+      properties:
+        id:
+          type: integer
+        url:
+          type: string
+        user_id:
+          type: integer
+        item_id:
+          type: integer
+      required:
+        - id
+        - url
+        - user_id
+    Order:
+      title: Order
+      type: object
+      examples:
+        - id: 0
+          datetime: string
+          status: string
+          user:
+            id: 0
+            login: string
+            number: string
+      properties:
+        id:
+          type: integer
+        datetime:
+          type: string
+        status:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+      required:
+        - id
+        - datetime
+        - status
+        - user
   securitySchemes:
     HTTPAuth:
       type: http
@@ -288,6 +578,61 @@ components:
                 errors:
                   - loc: string
                     message: string
+    ItemsList:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+          examples: {}
+    Item:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Item'
+          examples: {}
+    Image:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/Image'
+          examples: {}
+    ImagesList:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Image'
+    OrdersList:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+          examples: {}
   parameters: {}
 security:
   - HTTPAuth: []
