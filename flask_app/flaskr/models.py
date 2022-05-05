@@ -1,68 +1,9 @@
+from datetime import datetime
+
 from flaskr.db import db
 from flaskr.mixins import BaseMixin, ImageMixin, UserMixin
 from flaskr.utils import generate_symlink_on_id
 
-user_role = db.Table('user_role',
-                     db.Column('user_id', db.Integer, db.ForeignKey(
-                         'user.id'), primary_key=True),
-                     db.Column('role_id', db.Integer, db.ForeignKey(
-                         'role.id'), primary_key=True)
-                     )
-
-
-class UserModel(UserMixin, db.Model):
-    __tablename__ = 'user'
-
-    # db data
-    id = db.Column(db.Integer,  primary_key=True)
-    login = db.Column(db.String(255), unique=True)
-    email = db.Column(db.String(255))
-    password_hash = db.Column(db.String(255))
-
-    # relationships
-    roles = db.relationship('RoleModel', secondary=user_role, lazy='subquery',
-                            backref=db.backref('users', lazy=True))
-
-    @property
-    def roles_id(self):
-        return [role.id for role in self.roles]
-
-    @property
-    def owner_id(self):
-        return self.id
-
-
-class RoleModel(db.Model, BaseMixin):
-    __tablename__ = 'role'
-
-    # db data
-    id = db.Column(db.Integer,  primary_key=True)
-    name = db.Column(db.String(255))
-
-    # relationships
-    users_id = generate_symlink_on_id("users", UserModel)
-
-class HousingModel(db.Model, BaseMixin):
-    __tablename__ = "housing"
-
-    # db data
-    id = db.Column(db.Integer,  primary_key=True)
-    rooms = db.Column(db.Integer)
-    size = db.Column(db.Integer)
-    floor = db.Column(db.Integer)
-    floor_total = db.Column(db.Integer)
-    city = db.Column(db.String(255))
-    address = db.Column(db.Text)
-    price = db.Column(db.BigInteger)
-    description = db.Column(db.Text)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-
-    # relationships
-    user = db.relationship("UserModel", backref = db.backref("housings"))
-
-    @property
-    def owner_id(self):
-        return self.user_id
 
 class ImageModel(db.Model, ImageMixin):
     __tablename__ = 'image'
@@ -70,14 +11,70 @@ class ImageModel(db.Model, ImageMixin):
     # db data
     id = db.Column(db.Integer,  primary_key=True)
     filename = db.Column(db.String(255), unique=True)
+    # Foreign keys
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    housing_id = db.Column(db.Integer, db.ForeignKey("housing.id"))
-
-    # relationships
-    user = db.relationship("UserModel", backref = db.backref("images", cascade="delete, all"))
-    housing = db.relationship("HousingModel", backref = db.backref("images"))
+    item_id = db.Column(db.Integer, db.ForeignKey("item.id"))
 
     @property
     def owner_id(self):
         return self.user_id
 
+
+class OrderModel(db.Model, BaseMixin):
+    __tablename__ = "order"
+
+    # db data
+    id = db.Column(db.Integer,  primary_key=True)
+    created = db.Column(db.DateTime, default=datetime.now())
+    status = db.Column(db.String(255))
+    # Foreign keys
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    item_id = db.Column(db.Integer, db.ForeignKey("item.id"))
+
+
+class UserModel(db.Model, UserMixin):
+    __tablename__ = 'user'
+
+    # db data
+    id = db.Column(db.Integer,  primary_key=True)
+    login = db.Column(db.String(255), unique=True)
+    number = db.Column(db.String(255), unique=True)
+    role = db.Column(db.String(255))
+
+    password_hash = db.Column(db.String(255))
+
+    # relationships
+    images = db.relationship(
+        "ImageModel",  backref=db.backref("user"))
+    orders = db.relationship(
+        "OrderModel", cascade="delete, all",  backref=db.backref("user"))
+
+    @property
+    def owner_id(self):
+        return self.id
+
+
+class ItemModel(db.Model, BaseMixin):
+    __tablename__ = "item"
+
+    # db data
+    id = db.Column(db.Integer,  primary_key=True)
+    size = db.Column(db.Integer)
+    price = db.Column(db.BigInteger)
+    rooms = db.Column(db.Integer)
+    floor = db.Column(db.Integer)
+    total_floor = db.Column(db.Integer)
+    type = db.Column(db.String(255))
+    city = db.Column(db.String(255))
+    address = db.Column(db.Text)
+    description = db.Column(db.Text)
+
+    # relationships
+    images_id = generate_symlink_on_id("images", ImageModel)
+    images = db.relationship(
+        "ImageModel",  backref=db.backref("item"))
+    orders = db.relationship(
+        "OrderModel", cascade="delete, all", backref=db.backref("item"))
+
+    # cascade
+    cascade_delete = [images]

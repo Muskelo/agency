@@ -40,6 +40,11 @@ class BaseMixin():
     def delete_(cls, id):
         item = cls.get_(id=id)
 
+        # cascade deleting
+        if item.cascade_delete:
+            for related_items in item.cascade_delete:
+                map(lambda item: item.delete_(item.id), related_items)
+
         save_in_db(delete=[item])
 
         return item

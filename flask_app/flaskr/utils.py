@@ -3,7 +3,8 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from flaskr.db import db
 
-def save_in_db(add: dict=[], delete: dict=[]) -> None: 
+
+def save_in_db(add: dict = [], delete: dict = []) -> None:
     """ Try save changes in db,
     add: itrable list on objects to save in db
     delete: itrable list on objects to delete from db
@@ -19,6 +20,7 @@ def save_in_db(add: dict=[], delete: dict=[]) -> None:
     except SQLAlchemyError as e:
         db.session.rollback()
         raise e
+
 
 def with_data(LoadClass=None):
     """ with_data,
@@ -45,6 +47,7 @@ def with_data(LoadClass=None):
             return result
         return wrapped
     return decorator
+
 
 def generate_symlink_on_id(items_name, ItemModel):
     def get_items_id(self):

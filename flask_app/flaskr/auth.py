@@ -6,8 +6,10 @@ from passlib.hash import pbkdf2_sha256
 
 from flaskr.models import UserModel
 
+
 class MyHTTPBasicAuth(HTTPBasicAuth):
-    def login_required(self, f=None, role=None, optional=None, get_item_f=None, get_item_view_arg="id"):
+    def login_required(self, f=None, role=None, optional=None, get_item_f=None, view_arg_name="id"):
+
         if f is not None and \
                 (role is not None or optional is not None):  # pragma: no cover
             raise ValueError(
@@ -15,11 +17,12 @@ class MyHTTPBasicAuth(HTTPBasicAuth):
 
         def check_owner(user):
             if get_item_f:
-                item_id = request.view_args[get_item_view_arg]
+                item_id = request.view_args[view_arg_name]
                 item = get_item_f(id=item_id)
 
-                if item.owner_id == user.id:
-                    return True
+                if item.owner_id != user.id:
+                    return False
+            return True
 
         def login_required_internal(f):
             @wraps(f)
@@ -38,7 +41,7 @@ class MyHTTPBasicAuth(HTTPBasicAuth):
                     user = self.authenticate(auth, password)
                     if user in (False, None):
                         status = 401
-                    elif not (self.authorize(role, user, auth) or check_owner(user)):
+                    elif not (check_owner(user) or self.authorize(role, user, auth)):
                         status = 403
                     if not optional and status:
                         try:
@@ -58,9 +61,10 @@ class MyHTTPBasicAuth(HTTPBasicAuth):
 
 auth = MyHTTPBasicAuth()
 
+
 @auth.get_user_roles
-def has_roles(user):
-    return [role.name for role in user.roles]
+def get_user_roles(user):
+    return [user.role]
 
 @auth.verify_password
 def verify_password(username, password):

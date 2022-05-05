@@ -10,4 +10,4 @@ def init_error_handler(app):
 
     @app.errorhandler(IntegrityError)
     def handle_integrity_exception(e):
-        abort(400, errors=e.orig.args)
+        abort(409, errors=e.orig.args)

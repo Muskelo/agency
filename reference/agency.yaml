@@ -4,7 +4,7 @@ info:
   version: '1.0'
   description: ''
 servers:
-  - url: 'http://localhost:3000/api'
+  - url: 'http://localhost:8080/api'
 paths:
   '/users/{userId}':
     parameters:
@@ -486,15 +486,16 @@ components:
       properties:
         id:
           type: integer
-        datetime:
+        created:
           type: string
+          format: date-time
         status:
           type: string
         user:
           $ref: '#/components/schemas/User'
       required:
         - id
-        - datetime
+        - created
         - status
         - user
   securitySchemes:
