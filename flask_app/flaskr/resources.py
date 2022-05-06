@@ -26,27 +26,29 @@ class UserResource(Resource):
 
         return pm.DumpUser(data=user).dict()
 
+    @auth.login_required(get_item_f=UserModel.get_)
+    @with_data(pm.PatchUser)
+    def patch(self, id):
+        user = UserModel.update_(id, **g.request_body['data'])
+
+        return pm.DumpUser(data=user).dict()
+
+    @auth.login_required(role='admin', get_item_f=UserModel.get_)
+    def delete(self, id):
+        if UserModel.get_(id=id).role == "admin":
+            abort(403, message="NOBODY can't delete admin")
+        user = UserModel.delete_(id)
+
+        return pm.DumpUser(data=user).dict()
+
 
 class UsersListResource(Resource):
 
     @with_data(pm.CreateUser)
     def post(self):
-        user = UserModel.create_(**g.request_data['data'])
+        user = UserModel.create_(**g.request_body['data'])
 
         return pm.DumpUser(data=user).dict()
-
-    @auth.login_required(role=['admin'], get_item_f=UserModel.get_)
-    def delete(self, id):
-        user = UserModel.delete_(id)
-
-        return DumpUser(data=user).dict()
-
-    @auth.login_required(role=['admin'], get_item_f=UserModel.get_)
-    @with_data(LoadOptionalUser)
-    def patch(self, id):
-        user = UserModel.update_(id, **g.request_data['user'])
-
-        return DumpUser(user=user).dict()
 
 
 class ImageResource(Resource):
@@ -55,8 +57,7 @@ class ImageResource(Resource):
     def post(self):
         image_file = request.files['image']
 
-        image = ImageModel.create_(
-            image_file=image_file, user_id=auth.current_user().id)
+        image = ImageModel.create_(image_file, user_id=auth.current_user().id)
 
         return DumpImage(image=image).dict()
 

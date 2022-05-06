@@ -41,7 +41,7 @@ class BaseMixin():
         item = cls.get_(id=id)
 
         # cascade deleting
-        if item.cascade_delete:
+        if hasattr(item, "cascade_delete"):
             for related_items in item.cascade_delete:
                 map(lambda item: item.delete_(item.id), related_items)
 
@@ -76,7 +76,7 @@ class UserMixin(BaseMixin):
 
     @classmethod
     def update_(cls, id, **kwargs):
-        if kwargs["password"]:
+        if "password" in kwargs:
             kwargs["password_hash"] = pbkdf2_sha256.hash(kwargs['password'])
             kwargs.pop("password")
 
@@ -86,26 +86,29 @@ class UserMixin(BaseMixin):
 
 
 class ImageMixin(BaseMixin):
-    @classmethod
-    def create_(cls, **kwargs):
-
-        # get image info
-        image_file = kwargs.pop("image_file")
+    @staticmethod
+    def save_image(image_file, image_id):
         image_filename = secure_filename(image_file.filename)
+        new_filename = os.path.join(
+            current_app.config['UPLOAD_FOLDER'], f"{image_id}__{image_filename}")
+
+        try:
+            image_file.save(new_filename)
+        except:
+            super().delete_(image_id)
+            abort(500)
+
+        return new_filename
+
+    @classmethod
+    def create_(cls, image_file, **kwargs):
 
         # create image object in DB
         image = super().create_(**kwargs)
 
-        # try save image file
-        filename = os.path.join(
-            current_app.config['UPLOAD_FOLDER'], f"{image.id}__{image_filename}")
-        try:
-            image_file.save(filename)
-        except:
-            super().delete_(image.id)
-            abort(500)
+        new_filename = cls.save_image(image_file, image.id)
 
         # update filename if file saved
-        image = super().update_(image.id, filename=filename)
+        image = super().update_(image.id, filename=new_filename)
 
         return image

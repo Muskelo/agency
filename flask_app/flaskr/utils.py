@@ -31,18 +31,18 @@ def with_data(LoadClass=None):
     def decorator(f):
         def wrapped(*args, **kwargs):
             # get data
-            data = request.get_json()
+            request_body = request.get_json()
 
             if LoadClass:
-                data = LoadClass(**data).dict()
+                request_body = LoadClass(**request_body).dict()
 
-            g.request_data = data
+            g.request_body = request_body
 
             # execute f
             result = f(*args, **kwargs)
 
             # clean
-            del g.request_data
+            del g.request_body
 
             return result
         return wrapped
