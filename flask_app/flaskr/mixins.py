@@ -42,8 +42,9 @@ class BaseMixin():
 
         # cascade deleting
         if hasattr(item, "cascade_delete"):
-            for related_items in item.cascade_delete:
-                map(lambda item: item.delete_(item.id), related_items)
+            for relationship in item.cascade_delete:
+                map(lambda item: item.delete_(item.id),
+                    getattr(item, relationship))
 
         save_in_db(delete=[item])
 

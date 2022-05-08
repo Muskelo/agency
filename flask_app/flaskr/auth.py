@@ -1,110 +1,72 @@
-from flask import request, g
-from flask_httpauth import HTTPBasicAuth
+from base64 import b64decode
 from functools import wraps
+
+from flask import request, g
 from flask_restful import abort
 from passlib.hash import pbkdf2_sha256
 
 from flaskr.models import UserModel
 
 
-class MyHTTPBasicAuth(HTTPBasicAuth):
+class Anonym():
+    @property
+    def is_auth(self):
+        return False
 
-    def authorize(self, role, user, auth):
-        if role is None:
-            return False
-        if isinstance(role, (list, tuple)):
-            roles = role
+    @property
+    def role(self):
+        return None
+
+
+class Authorization():
+    def login(self, login, password):
+        user = UserModel.get_(False, login=login)
+
+        if user and pbkdf2_sha256.verify(password, user.password_hash):
+            return user
         else:
-            roles = [role]
-        if user is True:
-            user = auth
-        if self.get_user_roles_callback is None:  # pragma: no cover
-            raise ValueError('get_user_roles callback is not defined')
-        user_roles = self.ensure_sync(self.get_user_roles_callback)(user)
-        if user_roles is None:
-            user_roles = {}
-        elif not isinstance(user_roles, (list, tuple)):
-            user_roles = {user_roles}
+            abort(401, message="Invalida credentials.")
+
+    def set_current_user(self):
+        if request.headers.get("Authorization"):
+            auth_string = request.headers.get("Authorization").split(" ")[1]
+            login, password = b64decode(auth_string).decode('ascii').split(":")
+
+            user = self.login(login, password)
         else:
-            user_roles = set(user_roles)
-        for role in roles:
-            if isinstance(role, (list, tuple)):
-                role = set(role)
-                if role & user_roles == role:
-                    return True
-            elif role in user_roles:
-                return True
+            user = Anonym()
 
-    @staticmethod
-    def check_owner(user, get_item_f, view_arg_name):
-        if not get_item_f:
-            return False
+        g.current_user = user
 
-        item_id = request.view_args[view_arg_name]
-        item = get_item_f(id=item_id)
-
-        if item.owner_id == user.id:
+    def check_role(self, role):
+        if role and g.current_user.role == role:
             return True
 
-    def login_required(self, f=None, role=None, optional=None, get_item_f=None, view_arg_name="id"):
+    def check_owner(self, get_f=None, view_arg="id", query_arg=None):
+        if not get_f:
+            return False
 
-        if f is not None and \
-                (role is not None or optional is not None):  # pragma: no cover
-            raise ValueError(
-                'role and optional are the only supported arguments')
+        if query_arg:
+            id = request.args.get(query_arg)
+        else:
+            id = request.view_args[view_arg]
 
-        def login_required_internal(f):
-            @wraps(f)
-            def decorated(*args, **kwargs):
-                auth = self.get_auth()
+        item = get_f(id=id)
 
-                # Flask normally handles OPTIONS requests on its own, but in
-                # the case it is configured to forward those to the
-                # application, we need to ignore authentication headers and
-                # let the request through to avoid unwanted interactions with
-                # CORS.
-                if request.method != 'OPTIONS':  # pragma: no cover
-                    password = self.get_auth_password(auth)
+        return item.owner_id == g.current_user.id
 
-                    status = None
-                    user = self.authenticate(auth, password)
-                    if user in (False, None):
-                        status = 401
-                    elif role or get_item_f:
-                        if not (self.check_owner(user, get_item_f, view_arg_name) or self.authorize(role, user, auth)):
-                            status = 403
-                    if not optional and status:
-                        try:
-                            return self.auth_error_callback(status)
-                        except TypeError:
-                            return self.auth_error_callback()
-
-                    g.flask_httpauth_user = user if user is not True \
-                        else auth.username if auth else None
-                return self.ensure_sync(f)(*args, **kwargs)
-            return decorated
-
-        if f:
-            return login_required_internal(f)
-        return login_required_internal
+    def auth_required(self, role=None, owner=dict()):
+        def decorator(f):
+            @ wraps(f)
+            def wrapper(*args, **kwargs):
+                if not g.current_user.is_auth:
+                    abort(401, message="Login required.")
+                if role or owner:
+                    if not (self.check_role(role) or self.check_owner(**owner)):
+                        abort(403, message="You don't have permission")
+                return f(*args, **kwargs)
+            return wrapper
+        return decorator
 
 
-auth = MyHTTPBasicAuth()
-
-
-@auth.get_user_roles
-def get_user_roles(user):
-    return [user.role]
-
-
-@auth.verify_password
-def verify_password(username, password):
-    user = UserModel.get_(False, login=username)
-
-    if user and pbkdf2_sha256.verify(password, user.password_hash):
-        return user
-
-
-@auth.error_handler
-def auth_error(status):
-    return abort(status)
+auth = Authorization()

@@ -53,6 +53,10 @@ class UserModel(db.Model, UserMixin):
     def owner_id(self):
         return self.id
 
+    @property
+    def is_auth(self):
+        return True
+
 
 class ItemModel(db.Model, BaseMixin):
     __tablename__ = "item"
@@ -77,4 +81,4 @@ class ItemModel(db.Model, BaseMixin):
         "OrderModel", cascade="delete, all", backref=db.backref("item"))
 
     # cascade
-    cascade_delete = [images]
+    cascade_delete = ["images"]

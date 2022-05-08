@@ -4,9 +4,14 @@ from flask_restful import Api
 
 from flaskr.db import db
 from flaskr.config import Configuration
-from flaskr.resources import ImageResource, UserResource, UsersListResource
 from flaskr.default import init_default_data
 from flaskr.errors import init_error_handler
+from flaskr.auth import auth
+from flaskr.resources import (
+    ImagesListResource,
+    UserResource, UsersListResource,
+    ItemResource, ItemsListResource,
+    OrderResource, OrdersListResource)
 
 
 def init_db(app):
@@ -19,9 +24,16 @@ def init_db(app):
 def init_api(app):
     api = Api(app, prefix="/api")
 
+    api.add_resource(ImagesListResource, '/images/')
+
     api.add_resource(UserResource, '/user/<id>')
     api.add_resource(UsersListResource, '/users/')
-    api.add_resource(ImageResource, '/images/', '/roles/<id>')
+
+    api.add_resource(ItemResource, '/item/<id>')
+    api.add_resource(ItemsListResource, '/items/')
+
+    api.add_resource(OrderResource, '/order/<id>')
+    api.add_resource(OrdersListResource, '/orders/')
 
 
 def create_app():
@@ -33,5 +45,9 @@ def create_app():
     init_db(app)
     init_api(app)
     init_error_handler(app)
+
+    @app.before_request
+    def before_request():
+        auth.set_current_user()
 
     return app
