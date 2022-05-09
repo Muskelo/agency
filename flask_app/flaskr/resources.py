@@ -42,7 +42,6 @@ class UserResource(Resource):
 
 
 class UsersListResource(Resource):
-
     @with_data(pm.CreateUser)
     def post(self):
         user = UserModel.create_(**g.request_body['data'])
@@ -51,10 +50,9 @@ class UsersListResource(Resource):
 
 
 class ImagesListResource(Resource):
-
     @auth.auth_required(role="admin")
     def get(self):
-        images = ImageModel.get_all_(
+        images = ImageModel.get_list_(
             user_id=auth.current_user().id, item_id=None)
 
         return pm.DumpImagesList(data=images).dict()
@@ -96,7 +94,14 @@ class ItemResource(Resource):
 
 class ItemsListResource(Resource):
     def get(self):
-        items = ItemModel.get_all_()
+        search = request.args.get("search")
+
+        if search:
+            like = {"address": search}
+        else:
+            like = None
+
+        items = ItemModel.get_list_(like=like)
 
         return pm.DumpItemsList(data=items).dict()
 
@@ -109,7 +114,6 @@ class ItemsListResource(Resource):
 
 
 class OrderResource(Resource):
-
     @auth.auth_required(role="admin")
     @with_data(pm.PatchOrder)
     def patch(self, id):
@@ -119,15 +123,14 @@ class OrderResource(Resource):
 
 
 class OrdersListResource(Resource):
-
     @auth.auth_required(role="admin")
     def get_orders_for_item(self, item_id):
-        orders = OrderModel.get_all_(item_id=item_id)
+        orders = OrderModel.get_list_(item_id=item_id)
         return pm.DumpOrdersListForItem(data=orders).dict()
 
     @auth.auth_required(role="admin", owner={"get_f": UserModel.get_, "query_arg": "user_id"})
     def get_orders_for_user(self, user_id):
-        orders = OrderModel.get_all_(user_id=user_id)
+        orders = OrderModel.get_list_(user_id=user_id)
         return pm.DumpOrdersListForUser(data=orders).dict()
 
     def get(self):

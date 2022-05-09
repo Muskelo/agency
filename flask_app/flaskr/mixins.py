@@ -1,6 +1,6 @@
 import os
 
-from flask import current_app
+from flask import current_app, request
 from flask_restful import abort
 from passlib.hash import pbkdf2_sha256
 from werkzeug.utils import secure_filename
@@ -23,10 +23,26 @@ class BaseMixin():
         return item
 
     @classmethod
-    def get_all_(cls, **kwargs):
-        items = cls.query.filter_by(**kwargs).all()
+    def get_list_(cls, default_limit=20, filter_by=None, like=None):
+        query = cls.query
 
-        return items
+        # filter
+        if filter_by:
+            query = query.filter_by(**filter_by)
+        if like:
+            for attr, value in like.items():
+                query = query.filter(
+                    getattr(cls, attr).like("%{}%".format(value)))
+
+        # offset,limit
+        offset = request.args.get("offset")
+        if offset:
+            query = query.offset(offset)
+
+        limit = request.args.get("limit") or default_limit
+        query = query.limit(limit)
+
+        return query.all()
 
     @classmethod
     def create_(cls, **kwargs):
