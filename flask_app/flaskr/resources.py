@@ -3,7 +3,6 @@ from flask_restful import Resource, abort
 
 import flaskr.pydantic_models as pm
 from flaskr.models import ItemModel, OrderModel, UserModel, ImageModel
-from flaskr.data_models import *
 from flaskr.utils import with_data
 from flaskr.auth import auth
 
