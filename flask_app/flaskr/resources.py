@@ -10,7 +10,7 @@ from flaskr.auth import auth
 class UserResource(Resource):
     @auth.auth_required()
     def get_me(self):
-        return auth.current_user()
+        return g.current_user
 
     @auth.auth_required(role="admin", owner={"get_f": UserModel.get_})
     def get_user(self, id):

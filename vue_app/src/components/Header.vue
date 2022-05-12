@@ -19,21 +19,46 @@
           <li class="nav-item mx-1">
             <a class="nav-link" href="#">Link</a>
           </li>
-          <li class="nav-item my-1 mx-lg-1">
-            <button class="btn btn-primary">Вход</button>
+          <li class="nav-item my-1 mx-lg-1" v-if="!currentUser.id">
+            <router-link :to="{ name: 'login'}" class="btn btn-primary">Вход</router-link>
           </li>
-          <li class="nav-item my-1 mx-lg-1">
-            <button class="btn btn-primary">Регистрация</button>
+          <li class="nav-item my-1 mx-lg-1" v-if="!currentUser.id">
+            <router-link :to="{ name: 'register'}" class="btn btn-primary">Регистрация</router-link>
+          </li>
+          <li class="nav-item my-1 mx-lg-1" v-if="currentUser.id">
+            <button class="btn btn-primary" @click="currentUser.logout">Выход</button>
           </li>
         </ul>
       </div>
 
     </div>
   </header>
+
+  <input v-model="user_id" type="text">
+  <button @click="get_user">get</button>
+  <p>{{user}}</p>
 </template>
 
 <script>
-export default {};
+import { useCurrentUserStore } from "../stores/currentUser.js";
+import { user_api } from "../api";
+
+export default {
+  data() {
+    let currentUser = useCurrentUserStore();
+    return {
+      currentUser,
+      user_api,
+      user_id: undefined,
+      user: undefined,
+    };
+  },
+  methods: {
+    async get_user() {
+      this.user = await this.user_api.get(this.user_id);
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
