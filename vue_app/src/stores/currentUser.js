@@ -2,43 +2,52 @@ import {defineStore} from 'pinia'
 import {defaults} from 'mande'
 import {user_api} from "../api"
 
+
 export const useCurrentUserStore = defineStore('currentUser', {
     state: () => {
-
-        let local_auth_header = localStorage.getItem("auth_header");
-        if (local_auth_header) {
-            this.auth(local_auth_header);
-        }
         return {
-            id: 0,
-            login: 0,
-            number: 0,
-            role: "",
+            data: {}
+        };
+    },
+    getters: {
+        getUser: async (state) => {
+            if (!state.data) {
+                return data
+            }
+            const local_auth_header = localStorage.getItem("auth_header");
         }
     },
-
     actions: {
         login_f(login, password) {
-            auth_header = "Basic " + window.btoa(login + ":" + password);
+            let auth_header = "Basic " + window.btoa(login + ":" + password);
 
-            auth(auth_header)
-            localStorage.setItem("auth_header", this.auth_header);
+            this.auth(auth_header);
+        },
+        logout() {
+            localStorage.removeItem("auth_header");
+            defaults.headers.Authorization = undefined;
+            this.data = undefined;
         },
         async auth(auth_header) {
             // set header to fetching data
             defaults.headers.Authorization = auth_header;
-            user = await user_api.get(-1)["data"];
-            if (user) {
-                for (let key in user) {
-                    this[key] = user[key]
-                }
-            } else {
+
+            const response = await user_api.get(-1);
+            const user = response["data"];
+            console.log(user);
+
+            // if bad credationals
+            if (!user) {
                 defaults.headers.Authorization = undefined;
+                return false;
             }
-        },
-        logout() {
-            this.auth_header = undefined;
-            localStorage.removeItem("auth_header");
+
+            // set data
+            this.data = user;
+
+            localStorage.setItem("auth_header", auth_header);
+
+            return user;
         }
     },
 })
