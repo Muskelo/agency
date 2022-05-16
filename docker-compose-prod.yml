@@ -4,7 +4,7 @@ services:
   db:
     image: mysql
     ports:
-      - "127.0.0.1:3306:3306"
+      - "3306:3306"
     env_file:
       - ./.env_dev
     volumes:
@@ -15,7 +15,7 @@ services:
   flask_app:
     build: ./flask_app
     ports: 
-      - '127.0.0.1:5000:5000'
+      - '5000:5000'
     env_file:
       - ./.env_dev
     volumes:
@@ -25,7 +25,7 @@ services:
   vue_app:
     build: ./vue_app
     ports: 
-      - '127.0.0.1:3000:3000'
+      - '3000:3000'
     env_file:
       - ./.env_dev
     volumes:
