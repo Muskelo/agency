@@ -5,10 +5,20 @@
 
 <script>
 import Header from "./components/Header.vue";
+import { useCurrentUserStore } from "./stores/currentUser";
 
 export default {
+  data() {
+    let currentUser = useCurrentUserStore();
+    return {
+      currentUser,
+    };
+  },
   components: {
     Header,
+  },
+  mounted() {
+    this.currentUser.init();
   },
 };
 </script>

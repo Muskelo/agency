@@ -6,27 +6,25 @@ import {user_api} from "../api"
 export const useCurrentUserStore = defineStore('currentUser', {
     state: () => {
         return {
-            data: {}
+            id: undefined,
+            login: undefined,
+            number: undefined
         };
     },
-    getters: {
-        getUser: async (state) => {
-            if (!state.data) {
-                return data
-            }
-            const local_auth_header = localStorage.getItem("auth_header");
-        }
-    },
     actions: {
+        async init() {
+            if (localStorage.getItem("auth_header")) {
+                this.auth(localStorage.getItem("auth_header"));
+            }
+        },
         login_f(login, password) {
             let auth_header = "Basic " + window.btoa(login + ":" + password);
-
             this.auth(auth_header);
         },
         logout() {
             localStorage.removeItem("auth_header");
             defaults.headers.Authorization = undefined;
-            this.data = undefined;
+            this.$reset();
         },
         async auth(auth_header) {
             // set header to fetching data
@@ -36,14 +34,15 @@ export const useCurrentUserStore = defineStore('currentUser', {
             const user = response["data"];
             console.log(user);
 
-            // if bad credationals
             if (!user) {
+                // if bad credationals
                 defaults.headers.Authorization = undefined;
                 return false;
+            } else {
+                for (let key in user) {
+                    this[key] = user[key];
+                }
             }
-
-            // set data
-            this.data = user;
 
             localStorage.setItem("auth_header", auth_header);
 
