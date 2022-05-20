@@ -57,13 +57,13 @@ class ImagesListResource(Resource):
 
         return pm.DumpImagesList(data=images).dict()
 
-    @auth.auth_required
+    @auth.auth_required()
     def post(self):
         image_file = request.files['image']
         if not image_file:
             abort(400, message="Image required")
 
-        image = ImageModel.create_(image_file, user_id=auth.current_user().id)
+        image = ImageModel.create_(image_file, user_id=g.current_user.id)
 
         return pm.DumpImage(data=image).dict()
 
