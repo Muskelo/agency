@@ -8,7 +8,7 @@ from flaskr.default import init_default_data
 from flaskr.errors import init_error_handler
 from flaskr.auth import auth
 from flaskr.resources import (
-    ImagesListResource,
+    ImagesListResource, ImageResource,
     UserResource, UsersListResource,
     ItemResource, ItemsListResource,
     OrderResource, OrdersListResource)
@@ -24,6 +24,7 @@ def init_db(app):
 def init_api(app):
     api = Api(app, prefix="/api")
 
+    api.add_resource(ImageResource, '/image/<id>')
     api.add_resource(ImagesListResource, '/images/')
 
     api.add_resource(UserResource, '/user/<id>')

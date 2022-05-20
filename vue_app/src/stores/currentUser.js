@@ -8,7 +8,8 @@ export const useCurrentUserStore = defineStore('currentUser', {
         return {
             id: undefined,
             login: undefined,
-            number: undefined
+            number: undefined,
+            auth_header: undefined
         };
     },
     actions: {
@@ -30,6 +31,7 @@ export const useCurrentUserStore = defineStore('currentUser', {
             // set header to fetching data
             defaults.headers.Authorization = auth_header;
 
+            // try login
             const response = await user_api.get(-1);
             const user = response["data"];
             console.log(user);
@@ -44,7 +46,9 @@ export const useCurrentUserStore = defineStore('currentUser', {
                 }
             }
 
+            // save
             localStorage.setItem("auth_header", auth_header);
+            this.auth_header = auth_header;
 
             return user;
         }

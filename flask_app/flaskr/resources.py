@@ -67,9 +67,11 @@ class ImagesListResource(Resource):
 
         return pm.DumpImage(data=image).dict()
 
-    # def delete(self, id):
-    #     image = ImageModel.delete_(id)
-    #     return {"name": image["filename"]}
+class ImageResource(Resource):
+    def delete(self, id):
+        image = ImageModel.delete_(id)
+
+        return pm.DumpImage(data=image).dict()
 
 
 class ItemResource(Resource):
