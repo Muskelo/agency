@@ -52,7 +52,8 @@ class ImagesListResource(Resource):
     @auth.auth_required(role="admin")
     def get(self):
         images = ImageModel.get_list_(
-            user_id=auth.current_user().id, item_id=None)
+                filter_by={"user_id":g.current_user.id, "item_id":None}
+                )
 
         return pm.DumpImagesList(data=images).dict()
 
