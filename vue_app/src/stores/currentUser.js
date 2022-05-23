@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia'
 import {defaults} from 'mande'
-import {user_api} from "../api"
+import {user_api, users_list_api} from "../api"
 
 
 export const useCurrentUserStore = defineStore('currentUser', {
@@ -51,6 +51,9 @@ export const useCurrentUserStore = defineStore('currentUser', {
             this.auth_header = auth_header;
 
             return user;
+        },
+        async register(data) {
+            await users_list_api.post({data: data});
         }
     },
 })
