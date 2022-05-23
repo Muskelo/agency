@@ -1,22 +1,9 @@
 <template>
 	<!-- slider -->
-	<div
-		id="carouselCreateItem"
-        v-if="slider"
-		class="carousel slide"
-		data-bs-ride="carousel"
-		data-bs-interval="false"
-	>
+	<div id="carouselCreateItem" v-if="slider" class="carousel slide" data-bs-interval="false">
 		<div class="carousel-inner ratio ratio-16x9">
 			<!-- images list-->
-			<div
-				v-for="image in images"
-				:key="image.id"
-				:id="image.id"
-				:class="{ active: images.indexOf(image) == 0 }"
-				ref="images"
-				class="carousel-item"
-			>
+			<div v-for="(image, index) in images" :key="image.id" :id="image.id" :class="{ active: index  === 0 }" ref="images" class="carousel-item">
 				<img :src="image.filename" class="d-block w-100" alt="..." />
 			</div>
 
@@ -25,22 +12,12 @@
 		</div>
 
 		<!-- prev button -->
-		<button
-			class="carousel-control-prev"
-			type="button"
-			data-bs-target="#carouselCreateItem"
-			data-bs-slide="prev"
-		>
+		<button class="carousel-control-prev" type="button" data-bs-target="#carouselCreateItem" data-bs-slide="prev">
 			<span class="carousel-control-prev-icon" aria-hidden="true"></span>
 			<span class="visually-hidden">Previous</span>
 		</button>
 		<!-- next button -->
-		<button
-			class="carousel-control-next"
-			type="button"
-			data-bs-target="#carouselCreateItem"
-			data-bs-slide="next"
-		>
+		<button class="carousel-control-next" type="button" data-bs-target="#carouselCreateItem" data-bs-slide="next">
 			<span class="carousel-control-next-icon" aria-hidden="true"></span>
 			<span class="visually-hidden">Next</span>
 		</button>
@@ -48,12 +25,7 @@
 
 	<!-- add/delete image -->
 	<div class="d-flex align-items-center justify-content-between">
-		<input
-			@change="uploadImage"
-			type="file"
-			name="image"
-			class="form-control"
-		/>
+		<input @change="uploadImage" type="file" name="image" class="form-control" />
 
 		<button @click="deleteImage" class="btn btn-danger">Удалить</button>
 	</div>
@@ -69,7 +41,7 @@ export default {
 		let currentUser = useCurrentUserStore();
 		return {
 			images: [],
-            slider: 1,
+			slider: 1,
 			currentUser,
 		};
 	},
@@ -77,6 +49,7 @@ export default {
 		async updateImages() {
 			const response = await images_list_api.get();
 			this.images = await response["data"];
+            console.log(this.$refs.images);
 		},
 		getActiveImageId() {
 			// get images
@@ -110,8 +83,9 @@ export default {
 			await image_api.delete(image_id);
 
 			// update images
-            this.$forceUpdate()
-
+			await this.updateImages();
+            this.$refs.images[0].push("active")
+            // this.$refs.images[0].classList.append("active")
 		},
 	},
 	mounted() {
