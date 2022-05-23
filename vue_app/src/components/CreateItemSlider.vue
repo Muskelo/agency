@@ -84,7 +84,7 @@ export default {
 
 			// update images
 			await this.updateImages();
-            this.$refs.images[0].push("active")
+            this.$refs.images[1].classList.push("active")
             // this.$refs.images[0].classList.append("active")
 		},
 	},

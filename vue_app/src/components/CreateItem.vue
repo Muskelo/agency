@@ -3,33 +3,144 @@
 	<section>
 		<div class="container py-3">
 			<!-- title -->
-			<div class="row">
+			<div class="row px-2">
 				<h4>Добавление нового объекта</h4>
 			</div>
 
-			<!-- image adding -->
-			<div class="row">
+			<!-- images title -->
+			<div class="row px-2">
 				<h5>Изображения</h5>
 			</div>
-			<div class="row g-2 mb-3">
-				<!-- slider -->
-				<CreateItemSlider ref="slider" />
+
+			<!-- grid images -->
+			<div class="row mb-2">
+				<div class="grid">
+					<!-- grid item -->
+					<div
+						v-for="image in images"
+						:key="image.id"
+						class="g-col-12 g-col-xl-6 position-relative"
+					>
+						<!-- image -->
+						<div class="ratio ratio-16x9">
+							<img
+								:src="image.filename"
+								alt="image.filename"
+								class="img-fluid"
+							/>
+						</div>
+						<!-- button -->
+						<button
+							@click="deleteImage(image.id)"
+							class="btn btn-danger position-absolute bottom-0 end-0 translate-middle"
+						>
+							Удалить
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- add images -->
+			<div class="row mb-3">
+				<div class="d-flex align-items-center justify-content-between">
+					<input
+						@change="uploadImage"
+						type="file"
+						name="image"
+						class="form-control"
+					/>
+				</div>
 			</div>
 
 			<!-- rest data -->
-			<div class="row">
+			<div class="row px-2">
 				<h5>Данные</h5>
 			</div>
 
-			<div class="mb-3 row">
-				<label for="email" class="col-sm-2 col-form-label">Email</label>
-				<div class="col-sm-10">
+			<div class="row row-cols-xl-2 g-1">
+				<div>
+					<label class="form-label">Площадь</label>
 					<input
+						v-model="size"
+						type="number"
+						class="form-control"
+						required
+					/>
+				</div>
+				<div>
+					<label class="form-label">Цена</label>
+					<input
+						v-model="price"
+						type="number"
+						class="form-control"
+						required
+					/>
+				</div>
+				<div>
+					<label class="form-label">Комнат</label>
+					<input
+						v-model="rooms"
+						type="number"
+						class="form-control"
+						required
+					/>
+				</div>
+				<div>
+					<label class="form-label">Этаж</label>
+					<input
+						v-model="floor"
+						type="number"
+						class="form-control"
+						required
+					/>
+				</div>
+				<div>
+					<label class="form-label">Всего этаже</label>
+					<input
+						v-model="total_floor"
+						type="number"
+						class="form-control"
+						required
+					/>
+				</div>
+				<div>
+					<label class="form-label">Тип</label>
+					<select v-model="type" class="form-select" required>
+						<option selected value="Квартира">Квартира</option>
+						<option value="Дом">Дом</option>
+						<option value="Дача">Дача</option>
+					</select>
+				</div>
+				<div>
+					<label class="form-label">Город</label>
+					<input
+						v-model="city"
 						type="text"
 						class="form-control"
-						id="email"
-						placeholder="email"
+						required
 					/>
+				</div>
+				<div>
+					<label class="form-label">Аддрес</label>
+					<input
+						v-model="address"
+						type="text"
+						class="form-control"
+						required
+					/>
+				</div>
+				<div class="w-100">
+					<label class="form-label">Описание</label>
+					<textarea
+						class="form-control"
+						v-model="description"
+						required
+					></textarea>
+				</div>
+				<div class="w-100 d-flex justify-content-center">
+					<button @click="createItem" class="btn btn-primary">
+						Добавить
+					</button>
 				</div>
 			</div>
 		</div>
@@ -38,8 +149,7 @@
 </template>
 
 <script>
-import { images_list_api } from "../api";
-import { image_api } from "../api";
+import { images_list_api, image_api, items_list_api } from "../api";
 import { useCurrentUserStore } from "../stores/currentUser";
 // components
 import CreateItemSlider from "./CreateItemSlider.vue";
@@ -52,57 +162,68 @@ export default {
 		let currentUser = useCurrentUserStore();
 		return {
 			images: Array(),
-			activeImageId: undefined,
 			currentUser,
+			size: undefined,
+			price: undefined,
+			rooms: undefined,
+			floor: undefined,
+			total_floor: undefined,
+			type: "Квартира",
+			city: undefined,
+			address: undefined,
+			description: undefined,
+			images_id: undefined,
 		};
 	},
 	methods: {
-		async getImages() {
+		async updateImages() {
 			const response = await images_list_api.get();
 			this.images = await response["data"];
 		},
-		showId() {
-			console.log(this.getActiveImageId());
-		},
-		getActiveImageId() {
-			// get images
-			const images = this.$refs.slider.$refs.images;
-
-			for (let key in images) {
-				if (images[key].classList.contains("active")) {
-					this.activeImageId = images[key].id;
-					return images[key].id;
-				}
-			}
-		},
 		async uploadImage(event) {
-			let image = event.target.files[0];
-			let data = new FormData();
+			const image = event.target.files[0];
+			const data = new FormData();
 			data.append("image", image);
 
 			await fetch("/api/images/", {
 				method: "POST",
 				body: data,
 				headers: { Authorization: this.currentUser.auth_header },
-			})
-				.then((response) => response.json())
-				.then((response_body) => console.log(response_body));
+			});
 
 			// update images
-			this.getImages();
+			this.updateImages();
 		},
-		async deleteImage() {
-			let image_id = this.getActiveImageId();
-			await image_api.delete(image_id);
+		async deleteImage(id) {
+			await image_api.delete(id);
 
 			// update images
-			await this.getImages();
-
-			this.$refs.slider.$forceUpdate();
+			this.updateImages();
+		},
+		async createItem() {
+			const images_id = Array.from(this.images, (x) => x.id);
+			const data = {
+				data: {
+					size: this.size,
+					price: this.price,
+					rooms: this.rooms,
+					floor: this.floor,
+					total_floor: this.total_floor,
+					type: this.type,
+					city: this.city,
+					address: this.address,
+					description: this.description,
+					images_id,
+				},
+			};
+			items_list_api.post(data);
+		},
+		show(id) {
+			console.log(id);
 		},
 	},
 	mounted() {
-		this.getImages();
+		this.updateImages();
 	},
 };
 </script>
