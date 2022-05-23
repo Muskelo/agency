@@ -17,6 +17,7 @@ class CreateItem(BaseModel):
 
     data: Model
 
+
 class PatchItem(BaseModel):
     class Model(BaseModel):
         size: Optional[int]
@@ -33,6 +34,13 @@ class PatchItem(BaseModel):
     data: Model
 
 
+class Image(BaseModel):
+    id: int
+    filename: str
+
+    class Config:
+        orm_mode = True
+
 
 class DumpItem(BaseModel):
     class Model(BaseModel):
@@ -47,11 +55,13 @@ class DumpItem(BaseModel):
         address: str
         description: str
         images_id: List[int]
+        images: List[Image]
 
         class Config:
             orm_mode = True
 
     data: Model
+
 
 class DumpItemsList(BaseModel):
     class Model(BaseModel):
@@ -66,6 +76,7 @@ class DumpItemsList(BaseModel):
         address: str
         description: str
         images_id: List[int]
+        images: List[Image]
 
         class Config:
             orm_mode = True
