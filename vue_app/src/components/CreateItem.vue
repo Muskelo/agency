@@ -32,7 +32,7 @@
 			<!-- add images -->
 			<div class="row mb-3">
 				<div class="d-flex align-items-center justify-content-between">
-					<input @change="uploadImage" type="file" name="image" class="form-control" required/>
+					<input @change="uploadImage" type="file" name="image" class="form-control" />
 				</div>
 			</div>
 
@@ -41,7 +41,7 @@
 				<h5>Данные</h5>
 			</div>
 
-			<div class="row row-cols-xl-2 g-1">
+			<div class="row row-cols-xl-2 g-2">
 				<div>
 					<label class="form-label">Площадь</label>
 					<input v-model="size" type="number" class="form-control" required />
@@ -72,7 +72,8 @@
 				</div>
 				<div>
 					<label class="form-label">Город</label>
-					<input v-model="city" type="text" class="form-control" required />
+					<input list="cities" v-model="city" type="text" class="form-control" required />
+					<dataList></dataList>
 				</div>
 				<div>
 					<label class="form-label">Аддрес</label>
@@ -83,9 +84,9 @@
 					<textarea class="form-control" v-model="description" required></textarea>
 				</div>
 				<div class="w-100 d-flex justify-content-center">
-					<button type="submit" @click="createItem" class="btn btn-primary">
+					<router-link :to="{ name: 'home'}" type="submit" @click="createItem" class="btn btn-primary">
 						Добавить
-					</button>
+					</router-link>
 				</div>
 			</div>
 		</form>
@@ -96,6 +97,8 @@
 <script>
 import { images_list_api, image_api, items_list_api } from "../api";
 import { useCurrentUserStore } from "../stores/currentUser";
+
+import dataList from "../components/dataList.vue";
 
 export default {
 	data() {
@@ -116,6 +119,7 @@ export default {
 			images_id: undefined,
 		};
 	},
+	components: { dataList },
 	methods: {
 		async updateImages() {
 			const response = await images_list_api.get();

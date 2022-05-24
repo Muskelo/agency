@@ -8,7 +8,8 @@
 				</div>
 				<div class="col-12 col-xl-6 text-center text-xl-start">
 					<h2 class="card-title">{{item.rooms}}-комн., {{item.size}}м<sup>2</sup>, {{item.floor}}/{{item.floor_total}} этаж</h2>
-					<p>Адресс: <strong>{{item.address}}</strong></p>
+					<p></p>
+                    <p>Адресс: <strong>г. {{item.city}}, {{item.address}}</strong></p>
 					<p>Цена: <strong>{{item.price}} тыс.р.</strong></p>
 					<router-link :to="{ name: 'chat', params: { id: null, item_id: item.id }}" class="btn btn-primary">Связаться</router-link>
 				</div>

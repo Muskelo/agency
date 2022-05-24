@@ -23,16 +23,12 @@ class BaseMixin():
         return item
 
     @classmethod
-    def get_list_(cls, default_limit=20, filter_by=None, like=None):
+    def get_list_(cls, default_limit=20, filter_by=None):
         query = cls.query
 
         # filter
         if filter_by:
             query = query.filter_by(**filter_by)
-        if like:
-            for attr, value in like.items():
-                query = query.filter(
-                    getattr(cls, attr).like("%{}%".format(value)))
 
         # offset,limit
         offset = request.args.get("offset")
@@ -129,3 +125,28 @@ class ImageMixin(BaseMixin):
         image = super().update_(image.id, filename=new_filename)
 
         return image
+
+
+class ItemMixin(BaseMixin):
+    @classmethod
+    def get_list_(cls, default_limit=20, filter_by=None, min_price=None, max_price=None):
+        query = cls.query
+
+        # filter
+        if filter_by:
+            query = query.filter_by(**filter_by)
+
+        if min_price:
+            query = query.filter(cls.price > min_price)
+        if max_price:
+            query = query.filter(cls.price < max_price)
+
+        # offset,limit
+        offset = request.args.get("offset")
+        if offset:
+            query = query.offset(offset)
+
+        limit = request.args.get("limit") or default_limit
+        query = query.limit(limit)
+
+        return query.all()

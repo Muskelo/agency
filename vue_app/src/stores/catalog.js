@@ -11,6 +11,11 @@ export const useCatalogStore = defineStore('catalog', {
         async init() {
             await items_list_api.get()
                 .then(response => this.items = response["data"]);
+        },
+        async updateCatalog(city, type,  rooms, min_price, max_price) {
+            await items_list_api.get(`?city=${city}&type=${type}&rooms=${rooms}&min_price=${min_price}&max_price=${max_price}`)
+                .then(response => this.items = response["data"])
         }
+
     }
 })

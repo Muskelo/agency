@@ -97,17 +97,16 @@ class ItemResource(Resource):
 
 class ItemsListResource(Resource):
     def get(self):
-        filter_by = {}
-        if request.args.get("rooms"):
-            filter_by["rooms"] = request.args.get("rooms")
 
-        like = {}
-        if request.args.get("address"):
-            like["address"] = request.args.get("address")
-        if request.args.get("city"):
-            like["city"] = request.args.get("city")
+        filter_keys = ["city", "type", "rooms"]
+        filter_by = {key: request.args.get(key)
+                     for key in filter_keys if request.args.get(key)}
 
-        items = ItemModel.get_list_(like=like, filter_by=filter_by)
+        min_price = request.args.get("min_price")
+        max_price = request.args.get("max_price")
+
+        items = ItemModel.get_list_(
+            filter_by=filter_by, min_price=min_price, max_price=max_price)
 
         return pm.DumpItemsList(data=items).dict()
 

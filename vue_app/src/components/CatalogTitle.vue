@@ -10,44 +10,64 @@
 			<div class="row">
 				<div class="col-xl-11 mb-3">
 					<form class="list-group list-group-horizontal-xl">
-						<input type="text" list="cities" class="list-group-item col-xl-3" placeholder="Город">
-						<input type="number" class="list-group-item col-xl-2" placeholder="Комнат">
-						<input type="text" class="list-group-item col-xl-7" placeholder="Улица, адресс...">
+						<!-- city -->
+						<input v-model="city" type="text" list="cities" class="list-group-item col-xl-3" placeholder="Город">
+						<dataList></dataList>
+						<!-- type -->
+						<select v-model="type" class="list-group-item col-xl-2">
+							<option value="">Выбрать тип</option>
+							<option value="Квартира">Квартира</option>
+							<option value="Дом">Дом</option>
+							<option value="Дача">Дача</option>
+						</select>
+						<!-- rooms -->
+						<input v-model="rooms" type="number" class="list-group-item col-xl-2" placeholder="Комнат">
+						<!-- price label -->
+						<label class="list-group-item col-xl-1 text-xl-end">Цена:</label>
+						<!-- mix price -->
+						<input v-model="min_price" type="number" class="list-group-item col-xl-2" placeholder="От">
+						<!-- max price -->
+						<input v-model="max_price" type="number" class="list-group-item col-xl-2" placeholder="До">
 					</form>
 				</div>
-				<!-- DATA LIST CITIES START  -->
-				<datalist id="cities">
-					<option v-for="city in cities" :key="city.city" :value="city.city" />
-				</datalist>
-				<!-- DATA LIST CITIES END  -->
 				<div class="mx-auto col-auto col-xl-1">
-					<button class="btn btn-primary">Поиск</button>
+					<button @click="search" class="btn btn-primary">Поиск</button>
 				</div>
 			</div>
-
 		</div>
 	</div>
 </template>
 
 <script>
-import json from "../assets/russia.json";
+import dataList from "../components/dataList.vue";
+import { useCatalogStore } from "../stores/catalog.js";
 
 export default {
 	data() {
+		const catalog = useCatalogStore();
 		return {
-			cities: json,
+			catalog,
+			city: "Казань",
+			type: "",
+			rooms: "",
+			min_price: "",
+			max_price: "",
 		};
 	},
+	components: {
+		dataList,
+	},
 	methods: {
-		async init() {
-			const fd = await open("../assets/russia.json");
-			console.log(fd);
-			const cities = await fd.readFile();
-
-			console.log(cities);
+		async search() {
+			this.catalog.updateCatalog(
+				this.city,
+				this.type,
+				this.rooms,
+				this.min_price,
+				this.max_price
+			);
 		},
 	},
-	mounted() {},
 };
 </script>
 

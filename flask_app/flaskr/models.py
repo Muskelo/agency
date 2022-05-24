@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flaskr.db import db
-from flaskr.mixins import BaseMixin, ImageMixin, UserMixin
+from flaskr.mixins import BaseMixin, ImageMixin, ItemMixin, UserMixin
 from flaskr.utils import generate_symlink_on_id
 
 
@@ -58,7 +58,7 @@ class UserModel(db.Model, UserMixin):
         return True
 
 
-class ItemModel(db.Model, BaseMixin):
+class ItemModel(db.Model, ItemMixin):
     __tablename__ = "item"
 
     # db data
