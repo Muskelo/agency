@@ -52,8 +52,8 @@ class ImagesListResource(Resource):
     @auth.auth_required(role="admin")
     def get(self):
         images = ImageModel.get_list_(
-                filter_by={"user_id":g.current_user.id, "item_id":None}
-                )
+            filter_by={"user_id": g.current_user.id, "item_id": None}
+        )
 
         return pm.DumpImagesList(data=images).dict()
 
@@ -66,6 +66,7 @@ class ImagesListResource(Resource):
         image = ImageModel.create_(image_file, user_id=g.current_user.id)
 
         return pm.DumpImage(data=image).dict()
+
 
 class ImageResource(Resource):
     def delete(self, id):
@@ -96,19 +97,22 @@ class ItemResource(Resource):
 
 class ItemsListResource(Resource):
     def get(self):
-        search = request.args.get("search")
+        filter_by = {}
+        if request.args.get("rooms"):
+            filter_by["rooms"] = request.args.get("rooms")
 
-        if search:
-            like = {"address": search}
-        else:
-            like = None
+        like = {}
+        if request.args.get("address"):
+            like["address"] = request.args.get("address")
+        if request.args.get("city"):
+            like["city"] = request.args.get("city")
 
-        items = ItemModel.get_list_(like=like)
+        items = ItemModel.get_list_(like=like, filter_by=filter_by)
 
         return pm.DumpItemsList(data=items).dict()
 
-    @auth.auth_required(role="admin")
-    @with_data(pm.CreateItem)
+    @ auth.auth_required(role="admin")
+    @ with_data(pm.CreateItem)
     def post(self):
         item = ItemModel.create_(**g.request_body['data'])
 
@@ -116,8 +120,8 @@ class ItemsListResource(Resource):
 
 
 class OrderResource(Resource):
-    @auth.auth_required(role="admin")
-    @with_data(pm.PatchOrder)
+    @ auth.auth_required(role="admin")
+    @ with_data(pm.PatchOrder)
     def patch(self, id):
         order = OrderModel.update_(id, **g.request_body['data'])
 
@@ -125,12 +129,12 @@ class OrderResource(Resource):
 
 
 class OrdersListResource(Resource):
-    @auth.auth_required(role="admin")
+    @ auth.auth_required(role="admin")
     def get_orders_for_item(self, item_id):
         orders = OrderModel.get_list_(item_id=item_id)
         return pm.DumpOrdersListForItem(data=orders).dict()
 
-    @auth.auth_required(role="admin", owner={"get_f": UserModel.get_, "query_arg": "user_id"})
+    @ auth.auth_required(role="admin", owner={"get_f": UserModel.get_, "query_arg": "user_id"})
     def get_orders_for_user(self, user_id):
         orders = OrderModel.get_list_(user_id=user_id)
         return pm.DumpOrdersListForUser(data=orders).dict()
@@ -144,8 +148,8 @@ class OrdersListResource(Resource):
         elif user_id:
             return self.get_orders_for_user(user_id)
 
-    @auth.auth_required()
-    @with_data(pm.CreateOrder)
+    @ auth.auth_required()
+    @ with_data(pm.CreateOrder)
     def post(self):
         order = OrderModel.create_(
             **g.request_body['data'], user_id=g.current_user.id, status="wait")
