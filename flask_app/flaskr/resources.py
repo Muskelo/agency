@@ -20,10 +20,11 @@ class UserResource(Resource):
         if int(id) != -1:
             user = self.get_user(id)
 
+            return pm.DumpUser(data=user).dict()
         else:  # get current_user
             user = self.get_me()
 
-        return pm.DumpUser(data=user).dict()
+            return pm.DumpCurrentUser(data=user).dict()
 
     @auth.auth_required(owner={"get_f": UserModel.get_})
     @with_data(pm.PatchUser)
@@ -63,7 +64,10 @@ class ImagesListResource(Resource):
         if not image_file:
             abort(400, message="Image required")
 
-        image = ImageModel.create_(image_file, user_id=g.current_user.id)
+        item_id = request.args.get("item_id") or None
+
+        image = ImageModel.create_(
+            image_file, user_id=g.current_user.id, item_id=item_id)
 
         return pm.DumpImage(data=image).dict()
 

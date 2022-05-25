@@ -30,3 +30,15 @@ class DumpUser(BaseModel):
             orm_mode = True
 
     data: Model
+
+class DumpCurrentUser(BaseModel):
+    class Model(BaseModel):
+        id: int
+        login: str
+        number: str
+        role: str
+
+        class Config:
+            orm_mode = True
+
+    data: Model

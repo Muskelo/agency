@@ -4,7 +4,7 @@
 		<form class="container py-3">
 			<!-- title -->
 			<div class="row px-2">
-				<h4>Добавление нового объекта</h4>
+				<h4>Изменить объект</h4>
 			</div>
 
 			<!-- images title -->
@@ -84,9 +84,12 @@
 					<textarea class="form-control" v-model="description" required></textarea>
 				</div>
 				<div class="w-100 d-flex justify-content-center">
-					<router-link :to="{ name: 'home'}" type="submit" @click="createItem" class="btn btn-primary">
+					<!-- <router-link :to="{ name: 'item', params: {id: id}}" type="submit" @click="updateItem" class="btn btn-primary"> -->
+					<!-- 	Добавить -->
+					<!-- </router-link> -->
+					<a type="submit" @click="updateItem" class="btn btn-primary">
 						Добавить
-					</router-link>
+					</a>
 				</div>
 			</div>
 		</form>
@@ -95,12 +98,13 @@
 </template>
 
 <script>
-import { images_list_api, image_api, items_list_api } from "../api";
+import { images_list_api, image_api, items_list_api, item_api } from "../api";
 import { useCurrentUserStore } from "../stores/currentUser";
 
 import dataList from "../components/dataList.vue";
 
 export default {
+	props: ["id"],
 	data() {
 		let currentUser = useCurrentUserStore();
 		return {
@@ -121,31 +125,42 @@ export default {
 	},
 	components: { dataList },
 	methods: {
-		async updateImages() {
-			const response = await images_list_api.get();
-			this.images = await response["data"];
+		async getItem() {
+			await item_api.get(this.id).then((response) => {
+				const item = response["data"];
+				for (let key in item) {
+					if (key == "id") {
+						continue;
+					}
+					this[key] = item[key];
+				}
+			});
 		},
 		async uploadImage(event) {
 			const image = event.target.files[0];
 			const data = new FormData();
 			data.append("image", image);
 
-			await fetch("/api/images/", {
+			await fetch(`/api/images/?item_id=${this.id}`, {
 				method: "POST",
 				body: data,
 				headers: { Authorization: this.currentUser.auth_header },
 			});
 
 			// update images
-			this.updateImages();
+			this.getItem();
 		},
 		async deleteImage(id) {
+			if (this.images.length == 1) {
+				alert("Нельзя удалать все изображения");
+				return None;
+			}
 			await image_api.delete(id);
 
 			// update images
-			this.updateImages();
+			this.getItem();
 		},
-		async createItem() {
+		async updateItem() {
 			const images_id = Array.from(this.images, (x) => x.id);
 			const data = {
 				data: {
@@ -162,14 +177,16 @@ export default {
 				},
 			};
 
-			items_list_api.post(data);
+			const _ = await item_api.patch(this.id, data);
+
+			this.$router.push({ name: "item", params: { id: this.id } });
 		},
 		show(id) {
 			console.log(id);
 		},
 	},
 	mounted() {
-		this.updateImages();
+		this.getItem();
 	},
 };
 </script>

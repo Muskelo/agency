@@ -9,6 +9,7 @@ export const useCurrentUserStore = defineStore('currentUser', {
             id: undefined,
             login: undefined,
             number: undefined,
+            role: "",
             auth_header: undefined
         };
     },
