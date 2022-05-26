@@ -1,6 +1,7 @@
 import {defineStore} from 'pinia'
 import {defaults} from 'mande'
 import {user_api, users_list_api} from "../api"
+import {useAlertsStore} from "./alerts"
 
 
 export const useCurrentUserStore = defineStore('currentUser', {
@@ -33,25 +34,30 @@ export const useCurrentUserStore = defineStore('currentUser', {
             defaults.headers.Authorization = auth_header;
 
             // try login
-            const response = await user_api.get(-1);
-            const user = response["data"];
-            console.log(user);
+            await user_api.get(-1)
+                .then(response => {
+                    const user = response["data"];
+                    console.log(user);
 
-            if (!user) {
-                // if bad credationals
-                defaults.headers.Authorization = undefined;
-                return false;
-            } else {
-                for (let key in user) {
-                    this[key] = user[key];
-                }
-            }
+                    for (let key in user) {
+                        this[key] = user[key];
+                    }
 
-            // save
-            localStorage.setItem("auth_header", auth_header);
-            this.auth_header = auth_header;
+                    // save
+                    localStorage.setItem("auth_header", auth_header);
+                    this.auth_header = auth_header;
 
-            return user;
+                    return user;
+                })
+                .catch(error => {
+                    defaults.headers.Authorization = undefined;
+
+                    // make alert
+                    const alerts = useAlertsStore();
+                    alerts.addAlert("Вход", "Неверный логин или пароль");
+
+                    return false;
+                });
         },
         async register(data) {
             await users_list_api.post({data: data});

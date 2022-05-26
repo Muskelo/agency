@@ -36,7 +36,7 @@ class DumpCurrentUser(BaseModel):
         id: int
         login: str
         number: str
-        role: str
+        role: Optional[str]
 
         class Config:
             orm_mode = True

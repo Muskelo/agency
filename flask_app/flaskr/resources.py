@@ -132,24 +132,25 @@ class OrderResource(Resource):
 
 
 class OrdersListResource(Resource):
-    @ auth.auth_required(role="admin")
-    def get_orders_for_item(self, item_id):
-        orders = OrderModel.get_list_(item_id=item_id)
-        return pm.DumpOrdersListForItem(data=orders).dict()
+    # @auth.auth_required(role="admin")
+    # def get_orders_for_item(self, item_id):
+    #     orders = OrderModel.get_list_(item_id=item_id)
+    #     return pm.DumpOrdersListForItem(data=orders).dict()
 
-    @ auth.auth_required(role="admin", owner={"get_f": UserModel.get_, "query_arg": "user_id"})
-    def get_orders_for_user(self, user_id):
-        orders = OrderModel.get_list_(user_id=user_id)
-        return pm.DumpOrdersListForUser(data=orders).dict()
+    # @auth.auth_required(role="admin", owner={"get_f": UserModel.get_, "query_arg": "user_id"})
+    # def get_orders_for_user(self, user_id):
+    #     orders = OrderModel.get_list_(user_id=user_id)
+    #     return pm.DumpOrdersListForUser(data=orders).dict()
 
+    @auth.auth_required(role="admin")
     def get(self):
-        item_id = request.args.get("item_id")
-        user_id = request.args.get("user_id")
+        filter_keys = ["item_id", "user_id"]
+        filter_by = {key: request.args.get(key)
+                     for key in filter_keys if request.args.get(key)}
 
-        if item_id:
-            return self.get_orders_for_item(item_id)
-        elif user_id:
-            return self.get_orders_for_user(user_id)
+        orders = OrderModel.get_list_(filter_by=filter_by)
+
+        return pm.DumpOrdersList(data=orders).dict()
 
     @ auth.auth_required()
     @ with_data(pm.CreateOrder)

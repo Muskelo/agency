@@ -1,10 +1,12 @@
 <template>
 	<Header />
 	<router-view></router-view>
+	<Alerts />
 </template>
 
 <script>
 import Header from "./components/Header.vue";
+import Alerts from "./components/Alerts.vue";
 import { useCurrentUserStore } from "./stores/currentUser";
 import { useCatalogStore } from "./stores/catalog";
 
@@ -19,10 +21,11 @@ export default {
 	},
 	components: {
 		Header,
+		Alerts,
 	},
 	mounted() {
 		this.currentUser.init();
-        this.catalog.init();
+		this.catalog.init();
 	},
 };
 </script>

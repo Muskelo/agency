@@ -98,19 +98,25 @@
 </template>
 
 <script>
-import { images_list_api, image_api, items_list_api, item_api } from "../api";
+import { image_api, item_api } from "../api";
+// stores
 import { useCurrentUserStore } from "../stores/currentUser";
-
+import { useAlertsStore } from "../stores/alerts";
+// components
 import dataList from "../components/dataList.vue";
 
 export default {
 	props: ["id"],
 	data() {
 		let currentUser = useCurrentUserStore();
+		let alerts = useAlertsStore();
+
 		return {
 			currentUser,
-			images: Array(),
+			alerts,
+
 			// data
+			images: Array(),
 			size: undefined,
 			price: undefined,
 			rooms: undefined,
@@ -152,8 +158,11 @@ export default {
 		},
 		async deleteImage(id) {
 			if (this.images.length == 1) {
-				alert("Нельзя удалать все изображения");
-				return None;
+				this.alerts.addAlert(
+					"Удаление изображения.",
+					"Нужно хотябы 1 изображение."
+				);
+				return false;
 			}
 			await image_api.delete(id);
 

@@ -16,7 +16,7 @@
 			<div class="collapse navbar-collapse flex-grow-0" id="navbarSupportedContent">
 				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 					<li class="nav-item mx-1">
-						<a class="nav-link" href="#">Link</a>
+						<router-link :to="{name: 'admin'}" class="nav-link">Админ. панель</router-link>
 					</li>
 					<!-- login -->
 					<li class="nav-item my-1 mx-lg-1" v-if="!currentUser.id">

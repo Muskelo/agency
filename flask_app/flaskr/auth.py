@@ -22,6 +22,9 @@ class Authorization():
     def login(self, login, password):
         user = UserModel.get_(False, login=login)
 
+        print(user, flush=True)
+        print(password, flush=True)
+
         if user and pbkdf2_sha256.verify(password, user.password_hash):
             return user
         else:
