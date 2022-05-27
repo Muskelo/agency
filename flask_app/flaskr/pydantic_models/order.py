@@ -85,37 +85,4 @@ class DumpOrdersList(BaseModel):
             orm_mode = True
 
     data: List[Model]
-
-
-# class DumpOrdersListForItem(BaseModel):
-#     class Model(BaseModel):
-#         id: int
-#         created: datetime.datetime
-#         status: str
-#         user: _User
-
-#         @validator('created')
-#         def validate_created(cls, v):
-#             return v.isoformat()
-
-#         class Config:
-#             orm_mode = True
-
-#     data: List[Model]
-
-
-# class DumpOrdersListForUser(BaseModel):
-#     class Model(BaseModel):
-#         id: int
-#         created: datetime.datetime
-#         status: str
-#         item: _Item
-
-#         @validator('created')
-#         def validate_created(cls, v):
-#             return v.isoformat()
-
-#         class Config:
-#             orm_mode = True
-
-#     data: List[Model]
+    total: int

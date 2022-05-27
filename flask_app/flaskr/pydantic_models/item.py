@@ -82,3 +82,4 @@ class DumpItemsList(BaseModel):
             orm_mode = True
 
     data: List[Model]
+    total: int

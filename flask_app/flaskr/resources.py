@@ -109,10 +109,10 @@ class ItemsListResource(Resource):
         min_price = request.args.get("min_price")
         max_price = request.args.get("max_price")
 
-        items = ItemModel.get_list_(
+        items, total = ItemModel.get_list_(
             filter_by=filter_by, min_price=min_price, max_price=max_price)
 
-        return pm.DumpItemsList(data=items).dict()
+        return pm.DumpItemsList(data=items, total=total).dict()
 
     @ auth.auth_required(role="admin")
     @ with_data(pm.CreateItem)
@@ -132,25 +132,15 @@ class OrderResource(Resource):
 
 
 class OrdersListResource(Resource):
-    # @auth.auth_required(role="admin")
-    # def get_orders_for_item(self, item_id):
-    #     orders = OrderModel.get_list_(item_id=item_id)
-    #     return pm.DumpOrdersListForItem(data=orders).dict()
-
-    # @auth.auth_required(role="admin", owner={"get_f": UserModel.get_, "query_arg": "user_id"})
-    # def get_orders_for_user(self, user_id):
-    #     orders = OrderModel.get_list_(user_id=user_id)
-    #     return pm.DumpOrdersListForUser(data=orders).dict()
-
     @auth.auth_required(role="admin")
     def get(self):
         filter_keys = ["item_id", "user_id"]
         filter_by = {key: request.args.get(key)
                      for key in filter_keys if request.args.get(key)}
 
-        orders = OrderModel.get_list_(filter_by=filter_by)
+        orders, total = OrderModel.get_list_(filter_by=filter_by)
 
-        return pm.DumpOrdersList(data=orders).dict()
+        return pm.DumpOrdersList(data=orders, total=total).dict()
 
     @ auth.auth_required()
     @ with_data(pm.CreateOrder)

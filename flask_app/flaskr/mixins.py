@@ -4,6 +4,7 @@ from flask import current_app, request
 from flask_restful import abort
 from passlib.hash import pbkdf2_sha256
 from werkzeug.utils import secure_filename
+from sqlalchemy.sql.expression import func
 
 from flaskr.utils import save_in_db
 
@@ -30,6 +31,8 @@ class BaseMixin():
         if filter_by:
             query = query.filter_by(**filter_by)
 
+        total = query.count()
+
         # offset,limit
         offset = request.args.get("offset")
         if offset:
@@ -38,7 +41,7 @@ class BaseMixin():
         limit = request.args.get("limit") or default_limit
         query = query.limit(limit)
 
-        return query.all()
+        return query.all(), total
 
     @classmethod
     def create_(cls, **kwargs):
@@ -91,7 +94,6 @@ class UserMixin(BaseMixin):
         user = super().create_(**kwargs)
 
         return user
-
 
     @classmethod
     def update_(cls, id, **kwargs):
@@ -147,6 +149,8 @@ class ItemMixin(BaseMixin):
         if max_price:
             query = query.filter(cls.price < max_price)
 
+        total = query.count()
+
         # offset,limit
         offset = request.args.get("offset")
         if offset:
@@ -155,4 +159,4 @@ class ItemMixin(BaseMixin):
         limit = request.args.get("limit") or default_limit
         query = query.limit(limit)
 
-        return query.all()
+        return query.all(), total

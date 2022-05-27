@@ -5,8 +5,6 @@ import Item from "./components/Item.vue";
 import CreateItem from "./components/CreateItem.vue";
 import EditItem from "./components/EditItem.vue";
 
-import Chat from "./components/Chat.vue";
-
 import Login from "./components/Login.vue";
 import Register from "./components/Register.vue";
 
@@ -34,12 +32,6 @@ const routes = [
         path: '/item/edit/:id',
         name: 'edit_item',
         component: EditItem, props: true
-    },
-    // chat
-    {
-        path: '/chat/',
-        name: 'chat',
-        component: Chat, props: true
     },
     // auth
     {
