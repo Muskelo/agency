@@ -15,7 +15,8 @@
 			<!-- menu -->
 			<div class="collapse navbar-collapse flex-grow-0" id="navbarSupportedContent">
 				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-					<li class="nav-item mx-1">
+					<!-- admin  -->
+					<li v-if="currentUser.hasRole(['admin', 'moder'])" class="nav-item mx-1">
 						<router-link :to="{name: 'admin'}" class="nav-link">Админ. панель</router-link>
 					</li>
 					<!-- login -->
@@ -43,9 +44,8 @@ import { useCurrentUserStore } from "../stores/currentUser.js";
 
 export default {
 	data() {
-		const currentUser = useCurrentUserStore();
 		return {
-			currentUser,
+			currentUser: useCurrentUserStore(),
 		};
 	},
 };

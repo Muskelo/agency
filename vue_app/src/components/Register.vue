@@ -30,7 +30,7 @@
 				</div>
 
 				<!-- Submit button -->
-				<router-link :to="{ name: 'home' }" type="submit" @click="register" class="btn btn-primary w-100 mb-3">Зарегистрироваться</router-link>
+				<button type="submit" @click="register" class="btn btn-primary w-100 mb-3">Зарегистрироваться</button>
 			</form>
 		</div>
 	</section>
@@ -39,12 +39,12 @@
 
 <script>
 import { useCurrentUserStore } from "../stores/currentUser";
+import { useAlertsStore } from "../stores/alerts.js";
 export default {
 	data() {
-		const currentUser = useCurrentUserStore();
-
 		return {
-			currentUser,
+			currentUser: useCurrentUserStore(),
+			alerts: useAlertsStore(),
 			// data
 			login: undefined,
 			number: undefined,
@@ -59,7 +59,31 @@ export default {
 				number: this.number,
 				password: this.password,
 			};
-			await this.currentUser.register(user_data);
+
+			try {
+				const response = await this.currentUser.register(user_data);
+				this.$router.push({ name: "home" });
+				this.alerts.addAlert(
+					"Регистрация",
+					"Регистрация прошла успено.",
+					"success"
+				);
+			} catch (error) {
+				console.log(error.message);
+				if (error.message == "BAD REQUEST") {
+					this.alerts.addAlert(
+						"Регистрация",
+						"Не верные данные",
+						"error"
+					);
+				} else if (error.message == "CONFLICT") {
+					this.alerts.addAlert(
+						"Регистрация",
+						"Пользователь с таким логином или телефоном уже существует",
+						"error"
+					);
+				}
+			}
 		},
 	},
 };

@@ -1,5 +1,5 @@
 import datetime
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel, validator
 
@@ -47,42 +47,32 @@ class CreateOrder(BaseModel):
 
 class PatchOrder(BaseModel):
     class Model(BaseModel):
-        status: str
+        status: Optional[str]
+        comment: Optional[str]
 
     data: Model
 
 
-class DumpOrder(BaseModel):
-    class Model(BaseModel):
-        id: int
-        created: datetime.datetime
-        status: str
-        user: _User
+class _Order(BaseModel):
+    id: int
+    created: datetime.datetime
+    status: str
+    user: _User
+    item: _Item
+    comment: Optional[str]
 
-        @validator('created')
-        def validate_created(cls, v):
-            return v.isoformat()
+    @validator('created')
+    def validate_created(cls, v):
+        return v.isoformat()
 
-        class Config:
-            orm_mode = True
-
-    data: Model
+    class Config:
+        orm_mode = True
 
 
 class DumpOrdersList(BaseModel):
-    class Model(BaseModel):
-        id: int
-        created: datetime.datetime
-        status: str
-        user: _User
-        item: _Item
-
-        @validator('created')
-        def validate_created(cls, v):
-            return v.isoformat()
-
-        class Config:
-            orm_mode = True
-
-    data: List[Model]
+    data: List[_Order]
     total: int
+
+
+class DumpOrder(BaseModel):
+    data: _Order

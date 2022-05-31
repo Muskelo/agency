@@ -39,7 +39,6 @@
             class="btn btn-primary mb-4 w-100"
             >Войти</router-link
           >
-          <p>{{ currentUser.auth_header }}</p>
         </form>
       </div>
     </div>

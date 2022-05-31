@@ -13,3 +13,9 @@ def init_default_data():
     if not moder_user:
         moder_user = UserModel.create_(
             login="moder", number="2222", password="moder", role="moder")
+
+    # definition simple user
+    moder_user = UserModel.get_(False, login="user")
+    if not moder_user:
+        moder_user = UserModel.create_(
+            login="user", number="3333", password="user")

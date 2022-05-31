@@ -1,10 +1,9 @@
 import os
 
-from flask import current_app, request
+from flask import current_app, request, g
 from flask_restful import abort
 from passlib.hash import pbkdf2_sha256
 from werkzeug.utils import secure_filename
-from sqlalchemy.sql.expression import func
 
 from flaskr.utils import save_in_db
 
@@ -24,17 +23,21 @@ class BaseMixin():
         return item
 
     @classmethod
-    def get_list_(cls, default_limit=20, filter_by=None):
+    def get_list_(cls, default_limit=20, filter_=None,  filter_by=None):
         query = cls.query
 
         # filter
         if filter_by:
             query = query.filter_by(**filter_by)
 
-        total = query.count()
+        if filter_:
+            for key, value in filter_.items():
+                query = query.filter(getattr(cls, key) == value)
 
-        # offset,limit
+        # total, offset,limit
+        total = query.count()
         offset = request.args.get("offset")
+
         if offset:
             query = query.offset(offset)
 
@@ -76,6 +79,34 @@ class BaseMixin():
         save_in_db()
 
         return item
+
+
+class OrderMixin(BaseMixin):
+    @classmethod
+    def get_list_(cls, default_limit=20, filter_=None,  filter_by=None, ItemModel=None, UserModel=None):
+        query = cls.query.join(cls.item).join(ItemModel.user)
+
+        # filter
+        if filter_by:
+            query = query.filter_by(**filter_by)
+
+        if filter_:
+            for key, value in filter_.items():
+                query = query.filter(getattr(cls, key) == value)
+
+        query = query.filter(UserModel.id == g.current_user.id)
+
+        # total, offset,limit
+        total = query.count()
+        offset = request.args.get("offset")
+
+        if offset:
+            query = query.offset(offset)
+
+        limit = request.args.get("limit") or default_limit
+        query = query.limit(limit)
+
+        return query.all(), total
 
 
 class UserMixin(BaseMixin):

@@ -20,9 +20,10 @@ export const useCurrentUserStore = defineStore('currentUser', {
                 this.auth(localStorage.getItem("auth_header"));
             }
         },
-        login_f(login, password) {
+        async login_f(login, password) {
             let auth_header = "Basic " + window.btoa(login + ":" + password);
-            this.auth(auth_header);
+            const user_id = await this.auth(auth_header);
+            return user_id
         },
         logout() {
             localStorage.removeItem("auth_header");
@@ -47,20 +48,24 @@ export const useCurrentUserStore = defineStore('currentUser', {
                     localStorage.setItem("auth_header", auth_header);
                     this.auth_header = auth_header;
 
-                    return user;
+                    return this.id;
                 })
                 .catch(error => {
                     defaults.headers.Authorization = undefined;
 
                     // make alert
                     const alerts = useAlertsStore();
-                    alerts.addAlert("Вход", "Неверный логин или пароль");
+                    alerts.addAlert("Вход", "Неверный логин или пароль", "error");
 
                     return false;
                 });
         },
         async register(data) {
             await users_list_api.post({data: data});
+        },
+        hasRole(roles) {
+            return Boolean(roles.indexOf(this.role) != -1)
         }
+
     },
 })

@@ -12,7 +12,7 @@ class UserResource(Resource):
     def get_me(self):
         return g.current_user
 
-    @auth.auth_required(role="admin", owner={"get_f": UserModel.get_})
+    @auth.auth_required(roles=["admin"], owner={"get_f": UserModel.get_})
     def get_user(self, id):
         return UserModel.get_(id=id)
 
@@ -33,26 +33,33 @@ class UserResource(Resource):
 
         return pm.DumpUser(data=user).dict()
 
-#     @auth.login_required(role='admin', get_item_f=UserModel.get_)
-#     def delete(self, id):
-#         if UserModel.get_(id=id).role == "admin":
-#             abort(403, message="NOBODY can't delete admin")
-#         user = UserModel.delete_(id)
-#         return pm.DumpUser(data=user).dict()
-
 
 class UsersListResource(Resource):
+
+    @auth.auth_required(roles=["admin"])
+    def get(self):
+        users, total = UserModel.get_list_()
+
+        return pm.DumpUsersList(data=users, total=total).dict()
+
     @with_data(pm.CreateUser)
     def post(self):
-        user = UserModel.create_(**g.request_body['data'])
+        user = UserModel.create_(**g.request_body['data'], role="user")
 
         return pm.DumpUser(data=user).dict()
 
 
+class ImageResource(Resource):
+    def delete(self, id):
+        image = ImageModel.delete_(id)
+
+        return pm.DumpImage(data=image).dict()
+
+
 class ImagesListResource(Resource):
-    @auth.auth_required(role="admin")
+    @auth.auth_required(roles=["admin", "moder"])
     def get(self):
-        images = ImageModel.get_list_(
+        images, total = ImageModel.get_list_(
             filter_by={"user_id": g.current_user.id, "item_id": None}
         )
 
@@ -72,27 +79,20 @@ class ImagesListResource(Resource):
         return pm.DumpImage(data=image).dict()
 
 
-class ImageResource(Resource):
-    def delete(self, id):
-        image = ImageModel.delete_(id)
-
-        return pm.DumpImage(data=image).dict()
-
-
 class ItemResource(Resource):
     def get(self, id):
         item = ItemModel.get_(id=id)
 
         return pm.DumpItem(data=item).dict()
 
-    @auth.auth_required(role="admin")
+    @auth.auth_required(roles=["admin"], owner={"get_f": ItemModel.get_})
     @with_data(pm.PatchItem)
     def patch(self, id):
         item = ItemModel.update_(id, **g.request_body['data'])
 
         return pm.DumpItem(data=item).dict()
 
-    @auth.auth_required(role="admin")
+    @auth.auth_required(roles=["admin"], owner={"get_f": ItemModel.get_})
     def delete(self, id):
         item = ItemModel.delete_(id)
 
@@ -114,38 +114,51 @@ class ItemsListResource(Resource):
 
         return pm.DumpItemsList(data=items, total=total).dict()
 
-    @ auth.auth_required(role="admin")
-    @ with_data(pm.CreateItem)
+    @auth.auth_required(roles=["admin", "moder"])
+    @with_data(pm.CreateItem)
     def post(self):
-        item = ItemModel.create_(**g.request_body['data'])
+
+        # user_id is set automatically
+        if "user_id" in g.request_body['data']:
+            del g.request_body['data']['user_id']
+
+        item = ItemModel.create_(
+            user_id=g.current_user.id, **g.request_body['data'])
 
         return pm.DumpItem(data=item).dict()
 
 
 class OrderResource(Resource):
-    @ auth.auth_required(role="admin")
-    @ with_data(pm.PatchOrder)
+    @auth.auth_required(roles=["admin", "moder"])
+    @with_data(pm.PatchOrder)
     def patch(self, id):
         order = OrderModel.update_(id, **g.request_body['data'])
 
         return pm.DumpOrder(data=order).dict()
 
+    @auth.auth_required(roles=["admin", "moder"])
+    def delete(self, id):
+        OrderModel.delete_(id)
+
+        return {}
+
 
 class OrdersListResource(Resource):
-    @auth.auth_required(role="admin")
+    @auth.auth_required(roles=["admin", "moder"])
     def get(self):
-        filter_keys = ["item_id", "user_id"]
-        filter_by = {key: request.args.get(key)
-                     for key in filter_keys if request.args.get(key)}
+        filter_keys = ["item_id"]
+        filter_ = {key: request.args.get(key)
+                   for key in filter_keys if request.args.get(key)}
 
-        orders, total = OrderModel.get_list_(filter_by=filter_by)
+        orders, total = OrderModel.get_list_(
+            filter_=filter_, ItemModel=ItemModel, UserModel=UserModel)
 
         return pm.DumpOrdersList(data=orders, total=total).dict()
 
-    @ auth.auth_required()
-    @ with_data(pm.CreateOrder)
+    @auth.auth_required()
+    @with_data(pm.CreateOrder)
     def post(self):
         order = OrderModel.create_(
-            **g.request_body['data'], user_id=g.current_user.id, status="wait")
+            **g.request_body['data'], user_id=g.current_user.id, status="Новая")
 
         return pm.DumpOrder(data=order).dict()

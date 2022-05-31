@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel
 
 
@@ -31,14 +31,18 @@ class DumpUser(BaseModel):
 
     data: Model
 
+class _User(BaseModel):
+    id: int
+    login: str
+    number: str
+    role: Optional[str]
+
+    class Config:
+        orm_mode = True
+
 class DumpCurrentUser(BaseModel):
-    class Model(BaseModel):
-        id: int
-        login: str
-        number: str
-        role: Optional[str]
+    data: _User
 
-        class Config:
-            orm_mode = True
-
-    data: Model
+class DumpUsersList(BaseModel):
+    data: List[_User]
+    total: int

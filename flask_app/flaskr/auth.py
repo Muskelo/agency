@@ -41,8 +41,11 @@ class Authorization():
 
         g.current_user = user
 
-    def check_role(self, role):
-        if role and g.current_user.role == role:
+    def check_role(self, roles):
+        if not roles:
+            return False
+
+        if g.current_user.role in roles:
             return True
 
     def check_owner(self, get_f=None, view_arg="id", query_arg=None):
@@ -58,14 +61,17 @@ class Authorization():
 
         return item.owner_id == g.current_user.id
 
-    def auth_required(self, role=None, owner=dict()):
+    def auth_required(self, roles=None, owner=None):
+        if not owner:
+            owner = {}
+
         def decorator(f):
             @ wraps(f)
             def wrapper(*args, **kwargs):
                 if not g.current_user.is_auth:
                     abort(401, message="Login required.")
-                if role or owner:
-                    if not (self.check_role(role) or self.check_owner(**owner)):
+                if roles or owner:
+                    if not (self.check_role(roles) or self.check_owner(**owner)):
                         abort(403, message="You don't have permission")
                 return f(*args, **kwargs)
             return wrapper

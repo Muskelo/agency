@@ -42,44 +42,29 @@ class Image(BaseModel):
         orm_mode = True
 
 
+class _Item(BaseModel):
+    id: int
+    size: int
+    price: int
+    rooms: int
+    floor: int
+    total_floor: int
+    type: str
+    city: str
+    address: str
+    description: str
+    images_id: List[int]
+    images: List[Image]
+    user_id: int
+
+    class Config:
+        orm_mode = True
+
+
 class DumpItem(BaseModel):
-    class Model(BaseModel):
-        id: int
-        size: int
-        price: int
-        rooms: int
-        floor: int
-        total_floor: int
-        type: str
-        city: str
-        address: str
-        description: str
-        images_id: List[int]
-        images: List[Image]
-
-        class Config:
-            orm_mode = True
-
-    data: Model
+    data: _Item
 
 
 class DumpItemsList(BaseModel):
-    class Model(BaseModel):
-        id: int
-        size: int
-        price: int
-        rooms: int
-        floor: int
-        total_floor: int
-        type: str
-        city: str
-        address: str
-        description: str
-        images_id: List[int]
-        images: List[Image]
-
-        class Config:
-            orm_mode = True
-
-    data: List[Model]
+    data: List[_Item]
     total: int

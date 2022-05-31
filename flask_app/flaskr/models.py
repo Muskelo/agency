@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flaskr.db import db
-from flaskr.mixins import BaseMixin, ImageMixin, ItemMixin, UserMixin
+from flaskr.mixins import BaseMixin, ImageMixin, ItemMixin, OrderMixin, UserMixin
 from flaskr.utils import generate_symlink_on_id
 
 
@@ -20,16 +20,22 @@ class ImageModel(db.Model, ImageMixin):
         return self.user_id
 
 
-class OrderModel(db.Model, BaseMixin):
+class OrderModel(db.Model, OrderMixin):
     __tablename__ = "order"
 
     # db data
     id = db.Column(db.Integer,  primary_key=True)
     created = db.Column(db.DateTime, default=datetime.now())
     status = db.Column(db.String(255))
+    comment = db.Column(db.Text)
     # Foreign keys
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     item_id = db.Column(db.Integer, db.ForeignKey("item.id"))
+
+    
+    @property
+    def owner_id(self):
+        return self.item.owner_id
 
 
 class UserModel(db.Model, UserMixin):
@@ -48,6 +54,8 @@ class UserModel(db.Model, UserMixin):
         "ImageModel",  backref=db.backref("user"))
     orders = db.relationship(
         "OrderModel", cascade="delete, all",  backref=db.backref("user"))
+    items_ = db.relationship(
+        "ItemModel",  backref=db.backref("user"))
 
     @property
     def owner_id(self):
@@ -73,8 +81,11 @@ class ItemModel(db.Model, ItemMixin):
     address = db.Column(db.Text)
     description = db.Column(db.Text)
 
-    # relationships
+    # foreign keys
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     images_id = generate_symlink_on_id("images", ImageModel)
+
+    # relationships
     images = db.relationship(
         "ImageModel",  backref=db.backref("item"))
     orders = db.relationship(
@@ -82,3 +93,7 @@ class ItemModel(db.Model, ItemMixin):
 
     # cascade
     cascade_delete = ["images"]
+
+    @property
+    def owner_id(self):
+        return self.user_id

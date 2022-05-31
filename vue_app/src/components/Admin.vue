@@ -1,15 +1,24 @@
 <template>
 	<section class="container">
-		<Orders />
+		<OrdersList />
+		<UsersList v-if="currentUser.hasRole('admin')" />
 	</section>
 </template>
 
 <script>
-import Orders from "./Orders.vue";
+import OrdersList from "./OrdersList.vue";
+import UsersList from "./UsersList.vue";
+import { useCurrentUserStore } from "../stores/currentUser";
 
 export default {
+	data() {
+		return {
+			currentUser: useCurrentUserStore(),
+		};
+	},
 	components: {
-		Orders,
+		OrdersList,
+		UsersList,
 	},
 };
 </script>

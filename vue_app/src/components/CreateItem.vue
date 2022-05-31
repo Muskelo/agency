@@ -84,27 +84,29 @@
 					<textarea class="form-control" v-model="description" required></textarea>
 				</div>
 				<div class="w-100 d-flex justify-content-center">
-					<router-link :to="{ name: 'home'}" type="submit" @click="createItem" class="btn btn-primary">
+					<button type="submit" @click="createItem" class="btn btn-primary">
 						Добавить
-					</router-link>
+					</button>
 				</div>
 			</div>
 		</form>
 	</section>
-	<button @click="showId">show</button>
 </template>
 
 <script>
 import { images_list_api, image_api, items_list_api } from "../api";
 import { useCurrentUserStore } from "../stores/currentUser";
+import { useAlertsStore } from "../stores/alerts";
 
 import dataList from "../components/dataList.vue";
 
 export default {
 	data() {
-		let currentUser = useCurrentUserStore();
+		let alerts = useAlertsStore();
+
 		return {
-			currentUser,
+			currentUser: useCurrentUserStore(),
+			alerts,
 			images: Array(),
 			// data
 			size: undefined,
@@ -113,14 +115,56 @@ export default {
 			floor: undefined,
 			total_floor: undefined,
 			type: "Квартира",
-			city: undefined,
+			city: "Казань",
 			address: undefined,
 			description: undefined,
-			images_id: undefined,
 		};
 	},
 	components: { dataList },
 	methods: {
+		// ITEMS METHODS
+		async createItem() {
+			const images_id = Array.from(this.images, (x) => x.id);
+			if (images_id.length == 0) {
+				this.alerts.addAlert(
+					"Добавление",
+					"Нужно хотябы 1 изображение"
+				);
+				return false;
+			}
+
+			const data = {
+				data: {
+					size: this.size,
+					price: this.price,
+					rooms: this.rooms,
+					floor: this.floor,
+					total_floor: this.total_floor,
+					type: this.type,
+					city: this.city,
+					address: this.address,
+					description: this.description,
+					images_id: images_id,
+				},
+			};
+
+			try {
+				const response = await items_list_api.post(data);
+
+				// go to created item
+				this.$router.push({
+					name: "item",
+					params: { id: response.data.id },
+				});
+			} catch {
+				this.alerts.addAlert(
+					"Добавление",
+					"Неудалось создать объект.",
+					"error"
+				);
+			}
+		},
+		// IMAGES METHODS
 		async updateImages() {
 			const response = await images_list_api.get();
 			this.images = await response["data"];
@@ -144,28 +188,6 @@ export default {
 
 			// update images
 			this.updateImages();
-		},
-		async createItem() {
-			const images_id = Array.from(this.images, (x) => x.id);
-			const data = {
-				data: {
-					size: this.size,
-					price: this.price,
-					rooms: this.rooms,
-					floor: this.floor,
-					total_floor: this.total_floor,
-					type: this.type,
-					city: this.city,
-					address: this.address,
-					description: this.description,
-					images_id,
-				},
-			};
-
-			items_list_api.post(data);
-		},
-		show(id) {
-			console.log(id);
 		},
 	},
 	mounted() {

@@ -29,7 +29,7 @@
 				</li>
 
 				<!-- create cart -->
-				<li v-if="currentUser.role=='admin'" class="g-col-12 g-col-xl-3">
+				<li v-if="currentUser.hasRole(['admin', 'moder'])" class="g-col-12 g-col-xl-3">
 					<div class="card new-card justify-content-center align-items-center">
 						<router-link :to="{ name: 'create_item' }" class="btn btn-primary">Добавить</router-link>
 					</div>
