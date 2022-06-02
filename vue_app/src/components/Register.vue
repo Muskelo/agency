@@ -23,12 +23,6 @@
 					<input type="password" v-model="password" id="password" class="form-control" />
 				</div>
 
-				<!-- Repeat Password input -->
-				<div class="form-outline mb-4">
-					<label class="form-label" for="Password">Повтор пароля</label>
-					<input type="password" v-model="password_re" id="password_re" class="form-control" />
-				</div>
-
 				<!-- Submit button -->
 				<button type="submit" @click="register" class="btn btn-primary w-100 mb-3">Зарегистрироваться</button>
 			</form>
@@ -49,7 +43,6 @@ export default {
 			login: undefined,
 			number: undefined,
 			password: undefined,
-			password_re: undefined,
 		};
 	},
 	methods: {

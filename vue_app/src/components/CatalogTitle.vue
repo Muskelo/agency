@@ -11,23 +11,23 @@
 				<div class="col-xl-11 mb-3">
 					<form class="list-group list-group-horizontal-xl">
 						<!-- city -->
-						<input v-model="city" type="text" list="cities" class="list-group-item col-xl-3" placeholder="Город">
+						<input v-model="catalog.city" type="text" list="cities" class="list-group-item col-xl-3" placeholder="Город">
 						<dataList></dataList>
 						<!-- type -->
-						<select v-model="type" class="list-group-item col-xl-2">
+						<select v-model="catalog.type" class="list-group-item col-xl-2">
 							<option value="">Выбрать тип</option>
 							<option value="Квартира">Квартира</option>
 							<option value="Дом">Дом</option>
 							<option value="Дача">Дача</option>
 						</select>
 						<!-- rooms -->
-						<input v-model="rooms" type="number" class="list-group-item col-xl-2" placeholder="Комнат">
+						<input v-model="catalog.rooms" type="number" class="list-group-item col-xl-2" placeholder="Комнат">
 						<!-- price label -->
 						<label class="list-group-item col-xl-1 text-xl-end">Цена:</label>
 						<!-- mix price -->
-						<input v-model="min_price" type="number" class="list-group-item col-xl-2" placeholder="От">
+						<input v-model="catalog.min_price" type="number" class="list-group-item col-xl-2" placeholder="От">
 						<!-- max price -->
-						<input v-model="max_price" type="number" class="list-group-item col-xl-2" placeholder="До">
+						<input v-model="catalog.max_price" type="number" class="list-group-item col-xl-2" placeholder="До">
 					</form>
 				</div>
 				<div class="mx-auto col-auto col-xl-1">
@@ -47,11 +47,6 @@ export default {
 		const catalog = useCatalogStore();
 		return {
 			catalog,
-			city: "Казань",
-			type: "",
-			rooms: "",
-			min_price: "",
-			max_price: "",
 		};
 	},
 	components: {
@@ -59,13 +54,7 @@ export default {
 	},
 	methods: {
 		async search() {
-			this.catalog.updateCatalog(
-				this.city,
-				this.type,
-				this.rooms,
-				this.min_price,
-				this.max_price
-			);
+			this.catalog.updateCatalog();
 		},
 	},
     mounted() {

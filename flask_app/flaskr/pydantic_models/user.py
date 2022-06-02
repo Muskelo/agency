@@ -13,9 +13,7 @@ class CreateUser(BaseModel):
 
 class PatchUser(BaseModel):
     class Model(BaseModel):
-        login: Optional[str]
-        password: Optional[str]
-        number: Optional[str]
+        role: Optional[str]
 
     data: Model
 

@@ -26,7 +26,7 @@ class UserResource(Resource):
 
             return pm.DumpCurrentUser(data=user).dict()
 
-    @auth.auth_required(owner={"get_f": UserModel.get_})
+    @auth.auth_required(roles=["admin"])
     @with_data(pm.PatchUser)
     def patch(self, id):
         user = UserModel.update_(id, **g.request_body['data'])
@@ -38,7 +38,12 @@ class UsersListResource(Resource):
 
     @auth.auth_required(roles=["admin"])
     def get(self):
-        users, total = UserModel.get_list_()
+
+        filter_keys = ["login"]
+        filter_by = {key: request.args.get(key)
+                     for key in filter_keys if request.args.get(key)}
+
+        users, total = UserModel.get_list_(filter_by=filter_by)
 
         return pm.DumpUsersList(data=users, total=total).dict()
 
@@ -65,7 +70,7 @@ class ImagesListResource(Resource):
 
         return pm.DumpImagesList(data=images).dict()
 
-    @auth.auth_required()
+    @auth.auth_required(roles=["admin", "moder"])
     def post(self):
         image_file = request.files['image']
         if not image_file:
@@ -86,13 +91,13 @@ class ItemResource(Resource):
         return pm.DumpItem(data=item).dict()
 
     @auth.auth_required(roles=["admin"], owner={"get_f": ItemModel.get_})
-    @with_data(pm.PatchItem)
+    @ with_data(pm.PatchItem)
     def patch(self, id):
         item = ItemModel.update_(id, **g.request_body['data'])
 
         return pm.DumpItem(data=item).dict()
 
-    @auth.auth_required(roles=["admin"], owner={"get_f": ItemModel.get_})
+    @ auth.auth_required(roles=["admin"], owner={"get_f": ItemModel.get_})
     def delete(self, id):
         item = ItemModel.delete_(id)
 
@@ -147,11 +152,11 @@ class OrdersListResource(Resource):
     @auth.auth_required(roles=["admin", "moder"])
     def get(self):
         filter_keys = ["item_id"]
-        filter_ = {key: request.args.get(key)
-                   for key in filter_keys if request.args.get(key)}
+        filter_by = {key: request.args.get(key)
+                     for key in filter_keys if request.args.get(key)}
 
         orders, total = OrderModel.get_list_(
-            filter_=filter_, ItemModel=ItemModel, UserModel=UserModel)
+            filter_by=filter_by, ItemModel=ItemModel, UserModel=UserModel)
 
         return pm.DumpOrdersList(data=orders, total=total).dict()
 

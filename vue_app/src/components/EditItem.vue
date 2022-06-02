@@ -84,17 +84,13 @@
 					<textarea class="form-control" v-model="description" required></textarea>
 				</div>
 				<div class="w-100 d-flex justify-content-center">
-					<!-- <router-link :to="{ name: 'item', params: {id: id}}" type="submit" @click="updateItem" class="btn btn-primary"> -->
-					<!-- 	Добавить -->
-					<!-- </router-link> -->
-					<a type="submit" @click="updateItem" class="btn btn-primary">
-						Добавить
-					</a>
+					<button type="submit" @click="updateItem" class="btn btn-primary">
+						Сохранить
+					</button>
 				</div>
 			</div>
 		</form>
 	</section>
-	<button @click="showId">show</button>
 </template>
 
 <script>
@@ -108,12 +104,9 @@ import dataList from "../components/dataList.vue";
 export default {
 	props: ["id"],
 	data() {
-		let currentUser = useCurrentUserStore();
-		let alerts = useAlertsStore();
-
 		return {
-			currentUser,
-			alerts,
+			currentUser: useCurrentUserStore(),
+			alerts: useAlertsStore(),
 
 			// data
 			images: Array(),
@@ -142,20 +135,31 @@ export default {
 				}
 			});
 		},
+
 		async uploadImage(event) {
 			const image = event.target.files[0];
 			const data = new FormData();
 			data.append("image", image);
 
-			await fetch(`/api/images/?item_id=${this.id}`, {
+			const response = await fetch(`/api/images/?item_id=${this.id}`, {
 				method: "POST",
 				body: data,
-				headers: { Authorization: this.currentUser.auth_header },
+				headers: {
+					Authorization: this.currentUser.auth_header,
+				},
 			});
-
-			// update images
-			this.getItem();
+			if (response.status >= 200 && response.status < 300) {
+				// update images
+				this.getItem();
+			} else {
+				this.alerts.addAlert(
+					"Добавка изображения",
+					"Не удалось добавить изображение",
+					"error"
+				);
+			}
 		},
+
 		async deleteImage(id) {
 			if (this.images.length == 1) {
 				this.alerts.addAlert(
@@ -164,11 +168,20 @@ export default {
 				);
 				return false;
 			}
-			await image_api.delete(id);
 
-			// update images
-			this.getItem();
+			try {
+				const _ = await image_api.delete(id);
+				// update images
+				this.getItem();
+			} catch (error) {
+				this.alerts.addAlert(
+					"Удаление изображения",
+					"Не удалось удалить изображение",
+					"error"
+				);
+			}
 		},
+
 		async updateItem() {
 			const images_id = Array.from(this.images, (x) => x.id);
 			const data = {
@@ -185,10 +198,17 @@ export default {
 					images_id,
 				},
 			};
-
-			const _ = await item_api.patch(this.id, data);
-
-			this.$router.push({ name: "item", params: { id: this.id } });
+			try {
+				const _ = await item_api.patch(this.id, data);
+				// go to updatet item
+				this.$router.push({ name: "item", params: { id: this.id } });
+			} catch {
+				this.alerts.addAlert(
+					"Изменение объекта",
+					"Не удалось изменить объект",
+					"error"
+				);
+			}
 		},
 		show(id) {
 			console.log(id);

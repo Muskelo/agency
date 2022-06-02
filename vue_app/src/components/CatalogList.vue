@@ -35,6 +35,23 @@
 					</div>
 				</li>
 			</ul>
+
+			<!-- pagination -->
+			<div class="row">
+				<nav class="d-flex justify-content-center" aria-label="Page navigation example">
+					<ul class="pagination">
+						<li class="page-item">
+							<button @click="catalog.offset -= 20" :disabled="catalog.offset == 0" class="page-link">Назад</button>
+						</li>
+						<li v-for="(page, index) in catalog.pages" :key="index" :class="{ active: catalog.offset==(page-1)*20 }" class="page-item">
+							<button class="page-link" @click="catalog.offset=(page-1)*20">{{page}}</button>
+						</li>
+						<li class="page-item">
+							<button @click="catalog.offset += 20" :disabled="catalog.offset == (catalog.pages-1)*20" class="page-link">Вперед</button>
+						</li>
+					</ul>
+				</nav>
+			</div>
 		</div>
 	</div>
 </template>
@@ -52,6 +69,12 @@ export default {
 			currentUser,
 			catalog,
 		};
+	},
+	watch: {
+		// whenever question changes, this function will run
+        'catalog.offset'(newOffset, oldOffset) {
+			this.catalog.updateCatalog();
+		},
 	},
 };
 </script>

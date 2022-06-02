@@ -30,10 +30,6 @@ class BaseMixin():
         if filter_by:
             query = query.filter_by(**filter_by)
 
-        if filter_:
-            for key, value in filter_.items():
-                query = query.filter(getattr(cls, key) == value)
-
         # total, offset,limit
         total = query.count()
         offset = request.args.get("offset")

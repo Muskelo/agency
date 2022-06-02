@@ -23,6 +23,7 @@ export default {
 		Header,
 		Alerts,
 	},
+	methods:{},
 	mounted() {
 		this.currentUser.init();
 		this.catalog.init();
