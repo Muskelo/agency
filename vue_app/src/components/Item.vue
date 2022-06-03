@@ -49,6 +49,7 @@ import { item_api, orders_list_api } from "../api";
 // stores
 import { useCurrentUserStore } from "../stores/currentUser";
 import { useAlertsStore } from "../stores/alerts";
+import { useCatalogStore } from "../stores/catalog";
 // components
 import ItemSlider from "./ItemSlider.vue";
 
@@ -61,6 +62,7 @@ export default {
 		return {
 			currentUser: useCurrentUserStore(),
 			alerts: useAlertsStore(),
+			catalog: useCatalogStore(),
 			item: {},
 		};
 	},
@@ -105,10 +107,10 @@ export default {
 			}
 			try {
 				const _ = await item_api.delete(this.id);
-
-				this.$router.push({ name: "home" });
+				await this.catalog.updateCatalog();
 
 				this.alerts.addAlert("Удаление", "Объект удален", "success");
+				this.$router.push({ name: "home" });
 			} catch {
 				this.alerts.addAlert(
 					"Удаление",
