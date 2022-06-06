@@ -18,6 +18,7 @@
               type="text"
               id="login"
               class="form-control"
+              required
             />
           </div>
 
@@ -29,6 +30,7 @@
               type="password"
               id="password"
               class="form-control"
+              required
             />
           </div>
 

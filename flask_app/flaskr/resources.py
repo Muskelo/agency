@@ -111,6 +111,8 @@ class ItemsListResource(Resource):
         filter_by = {key: request.args.get(key)
                      for key in filter_keys if request.args.get(key)}
 
+        print(filter_by, flush=True)
+
         min_price = request.args.get("min_price")
         max_price = request.args.get("max_price")
 

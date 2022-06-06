@@ -81,7 +81,7 @@
 				</div>
 				<div class="w-100">
 					<label class="form-label">Описание</label>
-					<textarea class="form-control" v-model="description" required></textarea>
+					<textarea class="form-control" v-model="description" required ></textarea>
 				</div>
 				<div class="w-100 d-flex justify-content-center">
 					<button type="submit" @click="createItem" class="btn btn-primary">

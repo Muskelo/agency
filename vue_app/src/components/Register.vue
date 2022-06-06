@@ -8,19 +8,19 @@
 				<!-- Login input -->
 				<div class="form-outline mb-4">
 					<label class="form-label" for="login">Логин</label>
-					<input type="text" v-model="login" id="login" class="form-control" />
+					<input type="text" v-model="login" id="login" class="form-control" required/>
 				</div>
 
 				<!-- Number input -->
 				<div class="form-outline mb-4">
 					<label class="form-label" for="number">Телефон</label>
-					<input type="text" v-model="number" id="number" class="form-control" />
+					<input type="text" v-model="number" id="number" class="form-control" required/>
 				</div>
 
 				<!-- Password input -->
 				<div class="form-outline mb-4">
 					<label class="form-label" for="password">Пароль</label>
-					<input type="password" v-model="password" id="password" class="form-control" />
+					<input type="password" v-model="password" id="password" class="form-control" required/>
 				</div>
 
 				<!-- Submit button -->

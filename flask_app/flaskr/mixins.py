@@ -111,12 +111,8 @@ class UserMixin(BaseMixin):
     @classmethod
     def create_(cls, **kwargs):
 
-        print(kwargs, flush=True)
-
         kwargs["password_hash"] = pbkdf2_sha256.hash(kwargs['password'])
         kwargs.pop("password")
-
-        print(kwargs, flush=True)
 
         user = super().create_(**kwargs)
 
@@ -187,3 +183,4 @@ class ItemMixin(BaseMixin):
         query = query.limit(limit)
 
         return query.all(), total
+
