@@ -22,8 +22,8 @@ export const useCurrentUserStore = defineStore('currentUser', {
         },
         async login_f(login, password) {
             let auth_header = "Basic " + window.btoa(login + ":" + password);
-            const user_id = await this.auth(auth_header);
-            return user_id
+            const _ = await this.auth(auth_header);
+            return this.id
         },
         logout() {
             localStorage.removeItem("auth_header");

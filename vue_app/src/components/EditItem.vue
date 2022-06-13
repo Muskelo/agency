@@ -1,7 +1,7 @@
 <template>
 	<!-- create item component -->
 	<section>
-		<form class="container py-3">
+		<form @submit="updateItem" class="container py-3">
 			<!-- title -->
 			<div class="row px-2">
 				<h4>Изменить объект</h4>
@@ -44,23 +44,23 @@
 			<div class="row row-cols-xl-2 g-2">
 				<div>
 					<label class="form-label">Площадь</label>
-					<input v-model="size" type="number" class="form-control" required />
+					<input v-model="size" type="number" class="form-control" required  pattern="^[1-9]+$"/>
 				</div>
 				<div>
 					<label class="form-label">Цена, тыс.р.</label>
-					<input v-model="price" type="number" class="form-control" required />
+					<input v-model="price" type="number" class="form-control" required  pattern="^[1-9]+$"/>
 				</div>
 				<div>
 					<label class="form-label">Комнат</label>
-					<input v-model="rooms" type="number" class="form-control" required />
+					<input v-model="rooms" type="number" class="form-control" required  pattern="^[1-9]+$"/>
 				</div>
 				<div>
 					<label class="form-label">Этаж</label>
-					<input v-model="floor" type="number" class="form-control" required />
+					<input v-model="floor" type="number" class="form-control" required  pattern="^[1-9]+$"/>
 				</div>
 				<div>
 					<label class="form-label">Всего этаже</label>
-					<input v-model="total_floor" type="number" class="form-control" required />
+					<input v-model="total_floor" type="number" class="form-control" required  pattern="^[1-9]+$"/>
 				</div>
 				<div>
 					<label class="form-label">Тип</label>
@@ -72,19 +72,19 @@
 				</div>
 				<div>
 					<label class="form-label">Город</label>
-					<input list="cities" v-model="city" type="text" class="form-control" required />
+					<input list="cities" v-model="city" type="text" class="form-control" required minlength="3" maxlength="255"/>
 					<dataList></dataList>
 				</div>
 				<div>
 					<label class="form-label">Аддрес</label>
-					<input v-model="address" type="text" class="form-control" required />
+					<input v-model="address" type="text" class="form-control" required minlength="5"/>
 				</div>
 				<div class="w-100">
 					<label class="form-label">Описание</label>
 					<textarea class="form-control" v-model="description" required></textarea>
 				</div>
 				<div class="w-100 d-flex justify-content-center">
-					<button type="submit" @click="updateItem" class="btn btn-primary">
+					<button type="submit" class="btn btn-primary">
 						Сохранить
 					</button>
 				</div>

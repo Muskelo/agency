@@ -1,7 +1,7 @@
 <template>
 	<!-- create item component -->
 	<section>
-		<form class="container py-3">
+		<form @submit="createItem" class="container py-3">
 			<!-- title -->
 			<div class="row px-2">
 				<h4>Добавление нового объекта</h4>
@@ -44,23 +44,23 @@
 			<div class="row row-cols-xl-2 g-2">
 				<div>
 					<label class="form-label">Площадь</label>
-					<input v-model="size" type="number" class="form-control" required />
+					<input v-model="size" type="number" class="form-control" required pattern="^[1-9]+$" />
 				</div>
 				<div>
 					<label class="form-label">Цена, тыс.р.</label>
-					<input v-model="price" type="number" class="form-control" required />
+					<input v-model="price" type="number" class="form-control" required pattern="^[1-9]+$" />
 				</div>
 				<div>
 					<label class="form-label">Комнат</label>
-					<input v-model="rooms" type="number" class="form-control" required />
+					<input v-model="rooms" type="number" class="form-control" required pattern="^[1-9]+$" />
 				</div>
 				<div>
 					<label class="form-label">Этаж</label>
-					<input v-model="floor" type="number" class="form-control" required />
+					<input v-model="floor" type="number" class="form-control" required pattern="^[1-9]+$" />
 				</div>
 				<div>
 					<label class="form-label">Всего этаже</label>
-					<input v-model="total_floor" type="number" class="form-control" required />
+					<input v-model="total_floor" type="number" class="form-control" required pattern="^[1-9]+$" />
 				</div>
 				<div>
 					<label class="form-label">Тип</label>
@@ -72,19 +72,19 @@
 				</div>
 				<div>
 					<label class="form-label">Город</label>
-					<input list="cities" v-model="city" type="text" class="form-control" required />
+					<input list="cities" v-model="city" type="text" class="form-control" required minlength="3" />
 					<dataList></dataList>
 				</div>
 				<div>
 					<label class="form-label">Аддрес</label>
-					<input v-model="address" type="text" class="form-control" required />
+					<input v-model="address" type="text" class="form-control" required minlength="5" />
 				</div>
 				<div class="w-100">
 					<label class="form-label">Описание</label>
-					<textarea class="form-control" v-model="description" required ></textarea>
+					<textarea class="form-control" v-model="description" required></textarea>
 				</div>
 				<div class="w-100 d-flex justify-content-center">
-					<button type="submit" @click="createItem" class="btn btn-primary">
+					<button type="submit" class="btn btn-primary">
 						Добавить
 					</button>
 				</div>
@@ -97,6 +97,7 @@
 import { images_list_api, image_api, items_list_api } from "../api";
 import { useCurrentUserStore } from "../stores/currentUser";
 import { useAlertsStore } from "../stores/alerts";
+import { useCatalogStore } from "../stores/catalog";
 
 import dataList from "../components/dataList.vue";
 
@@ -107,6 +108,7 @@ export default {
 		return {
 			currentUser: useCurrentUserStore(),
 			alerts,
+			catalog: useCatalogStore(),
 			images: Array(),
 			// data
 			size: undefined,
@@ -150,6 +152,8 @@ export default {
 
 			try {
 				const response = await items_list_api.post(data);
+
+                await this.catalog.updateCatalog();
 
 				// go to created item
 				this.$router.push({

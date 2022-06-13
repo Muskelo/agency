@@ -58,7 +58,7 @@ export default {
 	},
 	methods: {
 		async updateUsersList() {
-			users_list_api.get(`?login=${this.search}`).then((response) => {
+            users_list_api.get(`?login=${this.search}&offset=${this.offset}`).then((response) => {
 				this.users = response["data"];
 				this.total = response["total"];
 				this.pages = Math.ceil(this.total / 20);

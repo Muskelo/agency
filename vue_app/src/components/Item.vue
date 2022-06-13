@@ -9,7 +9,7 @@
 				<div class="col-12 col-xl-6 text-center text-xl-start">
 					<h2 class="card-title">
 						<!-- type badge -->
-						<span class="badge bg-secondary">{{ item.type }}</span>
+						<span class="badge bg-secondary mx-1">{{ item.type }}</span>
 						<!-- info -->
 						{{ item.rooms }}-комн., {{ item.size }}м<sup>2</sup>,
 						{{ item.floor }}/{{ item.total_floor }} этаж
@@ -28,7 +28,7 @@
 						</button>
 					</h2>
 					<p>
-						Адресс:
+						Адрес:
 						<strong>г. {{ item.city }}, {{ item.address }}</strong>
 					</p>
 					<p>
